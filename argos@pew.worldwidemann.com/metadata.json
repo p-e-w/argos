@@ -1,0 +1,7 @@
+{
+  "uuid": "argos@pew.worldwidemann.com",
+  "name": "Argos",
+  "description": "Display the output of arbitrary programs in the GNOME Shell panel",
+  "url": "https://github.com/p-e-w/argos",
+  "shell-version": ["3.14", "3.16", "3.18", "3.20", "3.22"]
+}

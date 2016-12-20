@@ -104,6 +104,9 @@ function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, call
   if (!success)
     return;
 
+  GLib.close(stdinFile);
+  GLib.close(stderrFile);
+
   let standardOutput = "";
 
   let stdoutStream = new Gio.DataInputStream({
@@ -114,6 +117,7 @@ function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, call
 
   readStream(stdoutStream, function(output) {
     if (output === null) {
+      GLib.close(stdoutFile);
       callback(standardOutput);
     } else {
       standardOutput += output;

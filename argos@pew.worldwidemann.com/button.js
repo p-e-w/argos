@@ -74,8 +74,7 @@ const ArgosButton = new Lang.Class({
     try {
       Utilities.spawnWithCallback(null, [this._file.get_path()], null, 0, null,
         Lang.bind(this, function(standardOutput) {
-          if (standardOutput.trim().length > 0)
-            this._processOutput(standardOutput.split("\n"));
+          this._processOutput(standardOutput.split("\n"));
         }));
     } catch (error) {
       log("Unable to execute file '" + this._file.get_basename() + "': " + error);

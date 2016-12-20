@@ -54,7 +54,9 @@ function parseLine(lineString) {
       if (assignmentIndex >= 0) {
         let name = attributes[i].substring(0, assignmentIndex).trim();
         let value = attributes[i].substring(assignmentIndex + 1).trim();
-        line[name] = value;
+
+        if (name.length > 0 && value.length > 0)
+          line[name] = value;
       }
     }
 

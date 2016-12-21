@@ -45,7 +45,6 @@ function enable() {
       debounceTimeout = Mainloop.timeout_add(100, function() {
         debounceTimeout = null;
         addButtons();
-
         return false;
       });
     }

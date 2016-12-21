@@ -49,16 +49,7 @@ const ArgosButton = new Lang.Class({
 
     this.connect("destroy", Lang.bind(this, this._onDestroy));
 
-    this.update();
-
-    let updateInterval = Utilities.getUpdateInterval(file);
-
-    if (updateInterval !== null) {
-      this._updateTimeout = Mainloop.timeout_add_seconds(updateInterval, Lang.bind(this, function() {
-        this.update();
-        return true;
-      }));
-    }
+    this._update(Utilities.getUpdateInterval(file));
   },
 
   _onDestroy: function() {
@@ -71,10 +62,22 @@ const ArgosButton = new Lang.Class({
   },
 
   update: function() {
+    this._update(null);
+  },
+
+  _update: function(interval) {
     try {
       Utilities.spawnWithCallback(null, [this._file.get_path()], null, 0, null,
         Lang.bind(this, function(standardOutput) {
           this._processOutput(standardOutput.split("\n"));
+
+          if (interval !== null) {
+            this._updateTimeout = Mainloop.timeout_add_seconds(interval, Lang.bind(this, function() {
+              this._updateTimeout = null;
+              this._update(interval);
+              return false;
+            }));
+          }
         }));
     } catch (error) {
       log("Unable to execute file '" + this._file.get_basename() + "': " + error);

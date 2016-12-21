@@ -42,7 +42,7 @@ function enable() {
     // Some high-level file operations trigger multiple "changed" events in rapid succession.
     // Debouncing groups them together to avoid unnecessary updates.
     if (debounceTimeout === null) {
-      debounceTimeout = Mainloop.timeout_add(1000, function() {
+      debounceTimeout = Mainloop.timeout_add(100, function() {
         debounceTimeout = null;
         addButtons();
 

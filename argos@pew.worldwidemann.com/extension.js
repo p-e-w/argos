@@ -34,15 +34,17 @@ function init() {
 }
 
 function enable() {
-  updateButtons();
+  addButtons();
 
   directoryChangedId = directoryMonitor.connect("changed", function(monitor, file, otherFile, eventType) {
+    removeButtons();
+
     // Some high-level file operations trigger multiple "changed" events in rapid succession.
     // Debouncing groups them together to avoid unnecessary updates.
     if (debounceTimeout === null) {
       debounceTimeout = Mainloop.timeout_add(1000, function() {
         debounceTimeout = null;
-        updateButtons();
+        addButtons();
 
         return false;
       });
@@ -59,9 +61,7 @@ function disable() {
   removeButtons();
 }
 
-function updateButtons() {
-  removeButtons();
-
+function addButtons() {
   let files = [];
 
   let enumerator = directory.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NONE, null);

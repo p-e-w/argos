@@ -44,6 +44,8 @@ const ArgosButton = new Lang.Class({
     this._clutterText.use_markup = true;
     this._clutterText.text = "<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>";
 
+    this._isDestroyed = false;
+
     this._updateTimeout = null;
     this._cycleTimeout = null;
 
@@ -53,6 +55,8 @@ const ArgosButton = new Lang.Class({
   },
 
   _onDestroy: function() {
+    this._isDestroyed = true;
+
     if (this._updateTimeout !== null)
       Mainloop.source_remove(this._updateTimeout);
     if (this._cycleTimeout !== null)
@@ -69,6 +73,9 @@ const ArgosButton = new Lang.Class({
     try {
       Utilities.spawnWithCallback(null, [this._file.get_path()], null, 0, null,
         Lang.bind(this, function(standardOutput) {
+          if (this._isDestroyed)
+            return;
+
           this._processOutput(standardOutput.split("\n"));
 
           if (interval !== null) {

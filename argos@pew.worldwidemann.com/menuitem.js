@@ -12,16 +12,28 @@
 const Lang = imports.lang;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
+const St = imports.gi.St;
 const PopupMenu = imports.ui.popupMenu;
 
 const ArgosMenuItem = new Lang.Class({
   Name: "ArgosMenuItem",
-  Extends: PopupMenu.PopupMenuItem,
+  Extends: PopupMenu.PopupBaseMenuItem,
 
   _init: function(button, line) {
-    this.parent("");
+    this.parent();
 
-    let clutterText = this.label.get_clutter_text();
+    if (line.hasOwnProperty("iconName")) {
+      this.actor.add_child(new St.Icon({
+        style_class: "popup-menu-icon",
+        icon_name: line.iconName
+      }));
+    }
+
+    let label = new St.Label({});
+    this.actor.add_child(label);
+    this.actor.label_actor = label;
+
+    let clutterText = label.get_clutter_text();
     clutterText.use_markup = true;
     clutterText.text = line.markup;
 

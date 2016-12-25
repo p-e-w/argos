@@ -117,7 +117,7 @@ function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, call
 
   readStream(stdoutStream, function(output) {
     if (output === null) {
-      GLib.close(stdoutFile);
+      stdoutStream.close(null);
       callback(standardOutput);
     } else {
       standardOutput += output;

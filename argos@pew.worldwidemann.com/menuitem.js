@@ -12,7 +12,9 @@
 const Lang = imports.lang;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
+const GdkPixbuf = imports.gi.GdkPixbuf;
 const St = imports.gi.St;
+const Clutter = imports.gi.Clutter;
 const PopupMenu = imports.ui.popupMenu;
 
 const ArgosMenuItem = new Lang.Class({
@@ -27,9 +29,44 @@ const ArgosMenuItem = new Lang.Class({
         style_class: "popup-menu-icon",
         icon_name: line.iconName
       }));
+    } else if (line.hasOwnProperty("image") || line.hasOwnProperty("templateImage")) {
+      let image = line.hasOwnProperty("image") ? line.image : line.templateImage;
+
+      // Since support for data URIs was removed(!!!) from St, loading a Base64-encoded image
+      // into Clutter using Gjs has become an utter nightmare. The number of roadblocks
+      // and almost-working solutions is ridiculous. Some crucial bindings (e.g. for Cogl.Texture)
+      // appear to be missing entirely, while others (like MemoryInputStream.new_from_data)
+      // cause memory corruption and crash GNOME Shell. Base64 decoding itself has buggy bindings
+      // (should return a Uint8Array!). It goes without saying that all of this is either
+      // undocumented, poorly documented or wrongly(!) documented.
+      // In summary, the GNOME Shell developer's experience is still catastrophic. Fortunately,
+      // the working solution below was eventually found buried in gnome-maps (mapSource.js).
+      let bytes = GLib.Bytes.new(GLib.base64_decode(image));
+      let stream = Gio.MemoryInputStream.new_from_bytes(bytes);
+
+      try {
+        let pixbuf = GdkPixbuf.Pixbuf.new_from_stream(stream, null);
+
+        // TextureCache.load_gicon returns a square texture no matter what the Pixbuf's
+        // actual dimensions are, so we request a size that can hold all pixels of the
+        // image and then resize manually afterwards
+        let size = Math.max(pixbuf.width, pixbuf.height);
+        let texture = St.TextureCache.get_default().load_gicon(null, pixbuf, size, 1);
+        texture.set_size(pixbuf.width, pixbuf.height);
+
+        this.actor.add_child(texture);
+        // Do not stretch the texture to the height of the container
+        this.actor.child_set_property(texture, "y-fill", false);
+      } catch (error) {
+        log("Unable to load image from Base64 representation: " + error);
+      }
     }
 
-    let label = new St.Label({});
+    let label = new St.Label({
+      y_expand: true,
+      y_align: Clutter.ActorAlign.CENTER
+    });
+
     this.actor.add_child(label);
     this.actor.label_actor = label;
 

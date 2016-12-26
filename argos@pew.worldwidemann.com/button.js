@@ -51,7 +51,10 @@ const ArgosButton = new Lang.Class({
 
     this.connect("destroy", Lang.bind(this, this._onDestroy));
 
-    this._update(Utilities.getUpdateInterval(file));
+    this._updateRunning = false;
+    this._updateInterval = Utilities.getUpdateInterval(file);
+
+    this._update();
   },
 
   _onDestroy: function() {
@@ -66,28 +69,41 @@ const ArgosButton = new Lang.Class({
   },
 
   update: function() {
-    this._update(null);
+    if (this._updateTimeout !== null) {
+      Mainloop.source_remove(this._updateTimeout);
+      this._updateTimeout = null;
+    }
+
+    this._update();
   },
 
-  _update: function(interval) {
+  _update: function() {
+    if (this._updateRunning)
+      return;
+
+    this._updateRunning = true;
+
     try {
       Utilities.spawnWithCallback(null, [this._file.get_path()], null, 0, null,
         Lang.bind(this, function(standardOutput) {
+          this._updateRunning = false;
+
           if (this._isDestroyed)
             return;
 
           this._processOutput(standardOutput.split("\n"));
 
-          if (interval !== null) {
-            this._updateTimeout = Mainloop.timeout_add_seconds(interval, Lang.bind(this, function() {
+          if (this._updateInterval !== null) {
+            this._updateTimeout = Mainloop.timeout_add_seconds(this._updateInterval, Lang.bind(this, function() {
               this._updateTimeout = null;
-              this._update(interval);
+              this._update();
               return false;
             }));
           }
         }));
     } catch (error) {
       log("Unable to execute file '" + this._file.get_basename() + "': " + error);
+      this._updateRunning = false;
     }
   },
 

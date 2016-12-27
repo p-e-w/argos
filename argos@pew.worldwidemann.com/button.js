@@ -119,7 +119,7 @@ const ArgosButton = new Lang.Class({
       if (line.markup.length === 0)
         continue;
 
-      if (!dropdownMode && line.text === "---") {
+      if (!dropdownMode && line.isSeparator) {
         dropdownMode = true;
       } else if (dropdownMode) {
         dropdownLines.push(line);
@@ -157,13 +157,36 @@ const ArgosButton = new Lang.Class({
     if (this.menu.numMenuItems > 0)
       this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
+    let menus = [];
+    menus[0] = this.menu;
+
     for (let i = 0; i < dropdownLines.length; i++) {
-      if (dropdownLines[i].text === "---") {
-        // Although not documented, BitBar appears to render additional "---" lines as separators
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+      let menu;
+      if (dropdownLines[i].menuLevel in menus) {
+        menu = menus[dropdownLines[i].menuLevel];
       } else {
-        this.menu.addMenuItem(new ArgosMenuItem(this, dropdownLines[i]));
+        log("Invalid menu level for line '" + dropdownLines[i].text + "'");
+        menu = this.menu;
       }
+
+      let menuItem;
+
+      if (dropdownLines[i].isSeparator) {
+        // Although not documented, BitBar appears to render additional "---" lines as separators
+        menuItem = new PopupMenu.PopupSeparatorMenuItem();
+      } else if ((i + 1) < dropdownLines.length && dropdownLines[i + 1].menuLevel > dropdownLines[i].menuLevel) {
+        // GNOME Shell actually supports only a single submenu nesting level
+        // (deeper levels are rendered, but opening them closes the parent menu).
+        // Since adding PopupSubMenuMenuItems to submenus does not trigger
+        // an error or warning, this should be considered a bug in GNOME Shell.
+        // Once it is fixed, this code will work as expected for nested submenus.
+        menuItem = new PopupMenu.PopupSubMenuMenuItem(dropdownLines[i].text, false);
+        menus[dropdownLines[i + 1].menuLevel] = menuItem.menu;
+      } else {
+        menuItem = new ArgosMenuItem(this, dropdownLines[i]);
+      }
+
+      menu.addMenuItem(menuItem);
     }
 
     if (dropdownLines.length > 0)

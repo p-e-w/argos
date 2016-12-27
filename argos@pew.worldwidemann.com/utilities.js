@@ -67,6 +67,16 @@ function parseLine(lineString) {
     line.text = lineString.trim();
   }
 
+  let leadingDashes = line.text.search(/[^-]/);
+  if (leadingDashes >= 2) {
+    line.menuLevel = Math.floor(leadingDashes / 2);
+    line.text = line.text.substring(line.menuLevel * 2).trim();
+  } else {
+    line.menuLevel = 0;
+  }
+
+  line.isSeparator = /^-+$/.test(line.text);
+
   let markupAttributes = [];
 
   if (line.hasOwnProperty("color"))

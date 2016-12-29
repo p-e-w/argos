@@ -93,15 +93,92 @@ function parseLine(lineString) {
     markupAttributes.push("font_size='" + GLib.markup_escape_text(fontSize, -1) + "'");
   }
 
-  let text = (line.useMarkup === "false") ? GLib.markup_escape_text(line.text, -1) : line.text;
+  line.markup = line.text;
 
-  if (markupAttributes.length > 0) {
-    line.markup = "<span " + markupAttributes.join(" ") + ">" + text + "</span>";
-  } else {
-    line.markup = text;
+  if (line.useMarkup === "false") {
+    line.markup = GLib.markup_escape_text(line.markup, -1);
+    // Restore escaped ESC characters (needed for ANSI sequences)
+    line.markup = line.markup.replace("&#x1b;", "\x1b");
   }
 
+  // Note that while it is possible to format text using a combination of Pango markup
+  // and ANSI escape sequences, lines like "<b>ABC \e[1m DEF</b>" lead to unmatched tags
+  if (line.ansi !== "false")
+    line.markup = ansiToMarkup(line.markup);
+
+  if (markupAttributes.length > 0)
+    line.markup = "<span " + markupAttributes.join(" ") + ">" + line.markup + "</span>";
+
   return line;
+}
+
+const ANSI_COLORS = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"];
+
+function ansiToMarkup(text) {
+  let markup = "";
+
+  let markupAttributes = {};
+
+  let regex = new GLib.Regex("(\\e\\[([\\d;]*)m)", 0, 0);
+
+  // GLib's Regex.split is a fantastic tool for tokenizing strings because of an important detail:
+  // If the regular expression contains capturing groups, their matches are also returned.
+  // Therefore, tokens will be an array of the form
+  //   TEXT, [(FULL_ESC_SEQUENCE, SGR_SEQUENCE, TEXT), ...]
+  let tokens = regex.split(text, 0);
+
+  for (let i = 0; i < tokens.length; i++) {
+    if (regex.match(tokens[i], 0)[0]) {
+      // Default is SGR 0 (reset)
+      let sgrSequence = (tokens[i + 1].length > 0) ? tokens[i + 1] : "0";
+      let sgrCodes = sgrSequence.split(";");
+
+      for (let j = 0; j < sgrCodes.length; j++) {
+        if (sgrCodes[j].length === 0)
+          continue;
+
+        let code = parseInt(sgrCodes[j], 10);
+
+        if (code === 0) {
+          // Reset all attributes
+          markupAttributes = {};
+        } else if (code === 1) {
+          markupAttributes.font_weight = "bold";
+        } else if (code === 3) {
+          markupAttributes.font_style = "italic";
+        } else if (code === 4) {
+          markupAttributes.underline = "single";
+        } else if (30 <= code && code <= 37) {
+          markupAttributes.color = ANSI_COLORS[code - 30];
+        } else if (40 <= code && code <= 47) {
+          markupAttributes.bgcolor = ANSI_COLORS[code - 40];
+        }
+      }
+
+      let textToken = tokens[i + 2];
+
+      if (textToken.length > 0) {
+        let attributeString = "";
+        for (let attribute in markupAttributes) {
+          attributeString += " " + attribute + "='" + markupAttributes[attribute] + "'";
+        }
+
+        if (attributeString.length > 0) {
+          markup += "<span" + attributeString + ">" + textToken + "</span>";
+        } else {
+          markup += textToken;
+        }
+      }
+
+      // Skip processed tokens
+      i += 2;
+
+    } else {
+      markup += tokens[i];
+    }
+  }
+
+  return markup;
 }
 
 // Combines the benefits of spawn_sync (easy retrieval of output)

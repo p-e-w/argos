@@ -60,22 +60,22 @@ function parseLine(lineString) {
       }
     }
 
-    line.text = lineString.substring(0, separatorIndex).trim();
+    line.text = lineString.substring(0, separatorIndex);
 
   } else {
     // Line has no attributes
-    line.text = lineString.trim();
+    line.text = lineString;
   }
 
   let leadingDashes = line.text.search(/[^-]/);
   if (leadingDashes >= 2) {
     line.menuLevel = Math.floor(leadingDashes / 2);
-    line.text = line.text.substring(line.menuLevel * 2).trim();
+    line.text = line.text.substring(line.menuLevel * 2);
   } else {
     line.menuLevel = 0;
   }
 
-  line.isSeparator = /^-+$/.test(line.text);
+  line.isSeparator = /^-+$/.test(line.text.trim());
 
   let markupAttributes = [];
 
@@ -94,6 +94,9 @@ function parseLine(lineString) {
   }
 
   line.markup = line.text;
+
+  if (line.trim !== "false")
+    line.markup = line.markup.trim();
 
   if (line.useMarkup === "false") {
     line.markup = GLib.markup_escape_text(line.markup, -1);

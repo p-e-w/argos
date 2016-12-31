@@ -12,6 +12,9 @@
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const EMOJI = Extension.imports.emoji.EMOJI;
+
 function getUpdateInterval(file) {
   let updateInterval = null;
 
@@ -97,6 +100,13 @@ function parseLine(lineString) {
 
   if (line.unescape !== "false")
     line.markup = GLib.strcompress(line.markup);
+
+  if (line.emojize !== "false") {
+    line.markup = line.markup.replace(/:([\w+-]+):/g, function(match, emojiName) {
+      emojiName = emojiName.toLowerCase();
+      return EMOJI.hasOwnProperty(emojiName) ? EMOJI[emojiName] : match;
+    });
+  }
 
   if (line.trim !== "false")
     line.markup = line.markup.trim();

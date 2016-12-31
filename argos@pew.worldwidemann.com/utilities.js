@@ -95,6 +95,9 @@ function parseLine(lineString) {
 
   line.markup = line.text;
 
+  if (line.unescape !== "false")
+    line.markup = GLib.strcompress(line.markup);
+
   if (line.trim !== "false")
     line.markup = line.markup.trim();
 

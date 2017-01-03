@@ -125,6 +125,16 @@ function parseLine(lineString) {
   if (markupAttributes.length > 0)
     line.markup = "<span " + markupAttributes.join(" ") + ">" + line.markup + "</span>";
 
+  if (line.hasOwnProperty("bash")) {
+    // Append BitBar's legacy "paramN" attributes to the bash command
+    // (Argos allows placing arguments directy in the command string)
+    let i = 1;
+    while (line.hasOwnProperty("param" + i)) {
+      line.bash += " " + GLib.shell_quote(line["param" + i]);
+      i++;
+    }
+  }
+
   return line;
 }
 

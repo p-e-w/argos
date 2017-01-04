@@ -20,11 +20,13 @@ const ArgosLineView = new Lang.Class({
   Name: "ArgosLineView",
   Extends: St.BoxLayout,
 
-  _init: function() {
+  _init: function(line) {
     this.parent({
-      // Value from the default GNOME Shell theme (class "popup-menu-item")
-      style: "spacing: 12px;"
+      style_class: "argos-line-view"
     });
+
+    if (typeof line !== "undefined")
+      this.setLine(line);
   },
 
   setLine: function(line) {
@@ -74,5 +76,11 @@ const ArgosLineView = new Lang.Class({
       clutterText.use_markup = true;
       clutterText.text = line.markup;
     }
+  },
+
+  setMarkup: function(markup) {
+    this.setLine({
+      markup: markup
+    });
   }
 });

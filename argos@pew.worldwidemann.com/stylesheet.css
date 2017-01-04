@@ -1,5 +1,4 @@
-.argos-button-label {
-  font-weight: normal;
-  font-style: normal;
-  text-decoration: none;
+.argos-line-view {
+  /* Value from the default GNOME Shell theme (class "popup-menu-item") */
+  spacing: 12px;
 }

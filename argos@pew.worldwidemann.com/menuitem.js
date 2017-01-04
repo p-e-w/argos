@@ -24,8 +24,7 @@ const ArgosMenuItem = new Lang.Class({
   _init: function(button, line) {
     this.parent();
 
-    let lineView = new ArgosLineView();
-    lineView.setLine(line);
+    let lineView = new ArgosLineView(line);
     this.actor.add_child(lineView);
 
     this.connect("activate", Lang.bind(this, function() {

@@ -19,6 +19,7 @@ const PopupMenu = imports.ui.popupMenu;
 const Mainloop = imports.mainloop;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const ArgosLineView = Extension.imports.lineview.ArgosLineView;
 const ArgosMenuItem = Extension.imports.menuitem.ArgosMenuItem;
 const Utilities = Extension.imports.utilities;
 
@@ -31,18 +32,9 @@ const ArgosButton = new Lang.Class({
 
     this._file = file;
 
-    let label = new St.Label({
-      // Used to remove shell theme styling such as bold text (see stylesheet.css)
-      style_class: "argos-button-label",
-      y_expand: true,
-      y_align: Clutter.ActorAlign.CENTER
-    });
-
-    this.actor.add_actor(label);
-
-    this._clutterText = label.get_clutter_text();
-    this._clutterText.use_markup = true;
-    this._clutterText.text = "<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>";
+    this._lineView = new ArgosLineView();
+    this._lineView.setMarkup("<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>");
+    this.actor.add_actor(this._lineView);
 
     this._isDestroyed = false;
 
@@ -136,15 +128,15 @@ const ArgosButton = new Lang.Class({
     }
 
     if (buttonLines.length === 0) {
-      this._clutterText.text = GLib.markup_escape_text(this._file.get_basename(), -1);
+      this._lineView.setMarkup(GLib.markup_escape_text(this._file.get_basename(), -1));
     } else if (buttonLines.length === 1) {
-      this._clutterText.text = buttonLines[0].markup;
+      this._lineView.setLine(buttonLines[0]);
     } else {
-      this._clutterText.text = buttonLines[0].markup;
+      this._lineView.setLine(buttonLines[0]);
       let i = 0;
       this._cycleTimeout = Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
         i++;
-        this._clutterText.text = buttonLines[i % buttonLines.length].markup;
+        this._lineView.setLine(buttonLines[i % buttonLines.length]);
         return true;
       }));
 
@@ -180,7 +172,10 @@ const ArgosButton = new Lang.Class({
         // Since adding PopupSubMenuMenuItems to submenus does not trigger
         // an error or warning, this should be considered a bug in GNOME Shell.
         // Once it is fixed, this code will work as expected for nested submenus.
-        menuItem = new PopupMenu.PopupSubMenuMenuItem(dropdownLines[i].text, false);
+        menuItem = new PopupMenu.PopupSubMenuMenuItem("", false);
+        let lineView = new ArgosLineView(dropdownLines[i]);
+        menuItem.actor.insert_child_below(lineView, menuItem.label);
+        menuItem.label.visible = false;
         menus[dropdownLines[i + 1].menuLevel] = menuItem.menu;
       } else {
         menuItem = new ArgosMenuItem(this, dropdownLines[i]);

@@ -30,6 +30,8 @@ const ArgosLineView = new Lang.Class({
   },
 
   setLine: function(line) {
+    this.line = line;
+
     this.remove_all_children();
 
     if (line.hasOwnProperty("iconName")) {

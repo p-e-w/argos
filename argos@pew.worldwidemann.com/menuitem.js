@@ -59,6 +59,9 @@ const ArgosMenuItem = new Lang.Class({
       if (activeLine.hasOwnProperty("href"))
         Gio.AppInfo.launch_default_for_uri(activeLine.href, null);
 
+      if (activeLine.hasOwnProperty("eval"))
+        eval(activeLine.eval);
+
       if (activeLine.refresh === "true")
         button.update();
     }));

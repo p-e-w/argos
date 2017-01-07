@@ -135,6 +135,9 @@ function parseLine(lineString) {
     }
   }
 
+  line.hasAction = line.hasOwnProperty("bash") || line.hasOwnProperty("href") ||
+    line.hasOwnProperty("eval") || line.refresh === "true";
+
   return line;
 }
 

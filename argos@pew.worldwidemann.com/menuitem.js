@@ -23,7 +23,13 @@ const ArgosMenuItem = new Lang.Class({
   Extends: PopupMenu.PopupBaseMenuItem,
 
   _init: function(button, line, alternateLine) {
-    this.parent();
+    let hasAction = line.hasAction || (typeof alternateLine !== "undefined" && alternateLine.hasAction);
+
+    this.parent({
+      activate: hasAction,
+      hover: hasAction,
+      can_focus: hasAction
+    });
 
     let altSwitcher = null;
 
@@ -39,31 +45,33 @@ const ArgosMenuItem = new Lang.Class({
       this.actor.add_child(altSwitcher.actor);
     }
 
-    this.connect("activate", Lang.bind(this, function() {
-      let activeLine = (altSwitcher === null) ? line : altSwitcher.actor.get_child().line;
+    if (hasAction) {
+      this.connect("activate", Lang.bind(this, function() {
+        let activeLine = (altSwitcher === null) ? line : altSwitcher.actor.get_child().line;
 
-      if (activeLine.hasOwnProperty("bash")) {
-        let argv = [];
+        if (activeLine.hasOwnProperty("bash")) {
+          let argv = [];
 
-        if (activeLine.terminal === "false") {
-          argv = ["bash", "-c", activeLine.bash];
-        } else {
-          // Run bash immediately after executing the command to keep the terminal window open
-          // (see http://stackoverflow.com/q/3512055)
-          argv = ["gnome-terminal", "-e", "bash -c " + GLib.shell_quote(activeLine.bash + "; exec bash")];
+          if (activeLine.terminal === "false") {
+            argv = ["bash", "-c", activeLine.bash];
+          } else {
+            // Run bash immediately after executing the command to keep the terminal window open
+            // (see http://stackoverflow.com/q/3512055)
+            argv = ["gnome-terminal", "-e", "bash -c " + GLib.shell_quote(activeLine.bash + "; exec bash")];
+          }
+
+          GLib.spawn_async(null, argv, null, GLib.SpawnFlags.SEARCH_PATH, null);
         }
 
-        GLib.spawn_async(null, argv, null, GLib.SpawnFlags.SEARCH_PATH, null);
-      }
+        if (activeLine.hasOwnProperty("href"))
+          Gio.AppInfo.launch_default_for_uri(activeLine.href, null);
 
-      if (activeLine.hasOwnProperty("href"))
-        Gio.AppInfo.launch_default_for_uri(activeLine.href, null);
+        if (activeLine.hasOwnProperty("eval"))
+          eval(activeLine.eval);
 
-      if (activeLine.hasOwnProperty("eval"))
-        eval(activeLine.eval);
-
-      if (activeLine.refresh === "true")
-        button.update();
-    }));
+        if (activeLine.refresh === "true")
+          button.update();
+      }));
+    }
   }
 });

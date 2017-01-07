@@ -77,6 +77,18 @@ const ArgosLineView = new Lang.Class({
       let clutterText = label.get_clutter_text();
       clutterText.use_markup = true;
       clutterText.text = line.markup;
+
+      if (line.hasOwnProperty("length")) {
+        let maxLength = parseInt(line.length, 10);
+        // "clutterText.text.length" fails for non-BMP Unicode characters
+        let textLength = clutterText.buffer.get_length();
+
+        if (!isNaN(maxLength) && textLength > maxLength) {
+          clutterText.set_cursor_position(maxLength);
+          clutterText.delete_chars(textLength);
+          clutterText.insert_text("...", maxLength);
+        }
+      }
     }
   },
 

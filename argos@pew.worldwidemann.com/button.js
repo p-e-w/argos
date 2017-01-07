@@ -104,10 +104,10 @@ const ArgosButton = new Lang.Class({
     let dropdownMode = false;
 
     for (let i = 0; i < output.length; i++) {
-      let line = Utilities.parseLine(output[i]);
-
-      if (line.markup.length === 0)
+      if (output[i].length === 0)
         continue;
+
+      let line = Utilities.parseLine(output[i]);
 
       if (!dropdownMode && line.isSeparator) {
         dropdownMode = true;

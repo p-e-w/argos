@@ -1,11 +1,22 @@
 ![Header](https://cloud.githubusercontent.com/assets/2702526/21295125/68218a42-c574-11e6-98ba-6d8add0efb9e.png)
 
 
-# Argos – Display the output of arbitrary programs in the GNOME Shell panel
+## Argos – Create GNOME Shell extensions in seconds
 
-Argos is a GNOME Shell extension that turns executables' standard output into panel dropdown menus. It is inspired by, and largely compatible with, the [BitBar](https://github.com/matryer/bitbar) app for macOS. Argos supports many [BitBar plugins](https://github.com/matryer/bitbar-plugins) without modifications.
+[Most GNOME Shell extensions](https://extensions.gnome.org) do one thing: Add a button with a dropdown menu to the panel, displaying information and exposing functionality. Even in its simplest form, creating such an extension is a nontrivial task involving a poorly documented and ever-changing JavaScript API.
 
-Executable files in `~/.config/argos` are run and their output is placed in the panel as [documented in the BitBar README](https://github.com/matryer/bitbar#plugin-api). Argos monitors the directory for changes; new plugins and edits to existing plugins are automatically detected and reflected in the panel. The arrangement of the dropdown menus from left to right follows the alphabetical order of the files they are generated from. Files whose name starts with a dot (`.`) and files in subdirectories are ignored.
+**Argos lets you write GNOME Shell extensions in a language that every Linux user is already intimately familiar with: `bash` scripts!**
+
+More precisely, Argos is a GNOME Shell extension that turns executables' standard output into panel dropdown menus. It is inspired by, and fully compatible with, the [BitBar](https://github.com/matryer/bitbar) app for macOS. Argos supports many [BitBar plugins](https://github.com/matryer/bitbar-plugins) without modifications, giving you access to a large library of well-tested scripts in addition to being able to write your own.
+
+### Key features
+
+- **100% API compatible with BitBar 1.9.2:** All BitBar plugins that run on Linux (i.e. do not contain macOS-specific code) work with Argos (else it's a bug).
+- **Beyond BitBar:** Argos can do everything that BitBar can do, but also some things that BitBar can't do (yet). See the documentation for details.
+- **Sophisticated asynchronous execution engine:** No matter how long your scripts take to run, Argos will schedule them intelligently and prevent blocking.
+- **Unicode support:** Just print your text to stdout. It will be rendered the way you expect.
+- **Optimized for minimum resource consumption:** Even with multiple plugins refreshing every second, Argos typically uses less than 1% of the CPU.
+- **Fully documented**
 
 
 ## Installation
@@ -13,29 +24,86 @@ Executable files in `~/.config/argos` are run and their output is placed in the 
 Clone the repository, then copy or symlink the directory `argos@pew.worldwidemann.com` into `~/.local/share/gnome-shell/extensions`. Restart GNOME Shell by pressing <kbd>Alt+F2</kbd>, then entering `r`. On some systems, you may have to manually enable the Argos extension using GNOME Tweak Tool.
 
 
-## Usage example
+## Usage
 
-Save this bash script as `argos_demo.1m.sh`, make it executable and put it in the Argos config directory as described above:
+Argos monitors the directory `~/.config/argos` for changes. Any executable file found in this directory is considered a plugin. Files whose name starts with a dot (`.`) and files in subdirectories are ignored.
 
-```bash
-#!/usr/bin/env bash
+Plugins are run and their standard output is interpreted as described below. For each plugin, a panel button with a dropdown menu is created. The arrangement of buttons from left to right follows the alphabetical order of the files they are generated from. New plugins and edits to existing plugins are automatically detected and reflected in the panel.
 
-echo "<b>Argos</b> Demo"
-echo "---"
-echo "⏱ Current time: <span color='yellow'>$(date +'%H:%M')</span>   <i>(click to refresh)</i> | refresh=true"
-echo "Open Wikipedia... | href='https://en.wikipedia.org/wiki/Main_Page'"
-echo "Run  <tt><span color='green'>uname -a</span></tt>  in bash... | bash='uname -a'"
-echo "Run <span color='orange'>gedit</span>... | bash=gedit terminal=false"
-echo "---"
-echo "Emoji <span color='#ff0'>🙂</span><span color='#f00'>🦀</span><span color='#3f0'>🍀</span> | size=18"
-echo "Custom font | font='Liberation Serif' color=#abc size=larger"
+### File name format
+
+A plugin file may be named anything (it only needs to be executable), but if its name has the special form
+
+```
+NAME.INTERVAL.EXTENSION
 ```
 
-This popup menu will appear in the panel:
+where `INTERVAL` consists of an integer + a period abbreviation such as `s` (seconds), `m` (minutes), `h` (hours) or `d` (days), the plugin is re-run and its output re-rendered every `INTERVAL`.
 
-![Demo](https://cloud.githubusercontent.com/assets/2702526/21295128/82841be8-c574-11e6-8b7b-fd85da671e82.png)
+For example, a script named `plugin.10s.sh` would update every 10 seconds.
 
-Clicking the last menu item (*argos_demo.1m.sh*) opens the script in a text editor where it can be live-edited, with changes being immediately reflected on saving.
+### Output format
+
+Argos plugins are executables (such as shell scripts) that print to standard output lines of the following form:
+
+```
+TEXT | ATTRIBUTE_1=VALUE ATTRIBUTE_2=VALUE ...
+```
+
+All attributes are optional, so the most basic plugins simply print lines consisting of text to be displayed. To include whitespace, attribute values may be quoted using the same convention employed by most command line shells.
+
+### Rendering
+
+Lines containing only dashes (`---`) are *separators*.
+
+Lines above the first separator belong to the button itself. If there are multiple such lines, they are displayed in succession, each of them for 3 seconds before switching to the next. Additionally, all button lines get a dropdown menu item, except if their `dropdown` attribute is set to `false`.
+
+Lines below the first separator are rendered as dropdown menu items. Further separators create graphical separator menu items.
+
+Lines beginning with `--` are rendered in a submenu associated with the preceding unindented line. While Argos supports nested submenus *in principle*, GNOME Shell does not render them correctly as of version 3.22.
+
+[Emoji codes](http://www.emoji-cheat-sheet.com) like `:horse:` :horse: and `:smile:` :smile: in the line text are replaced with their corresponding Unicode characters (unless the `emojize` attribute is set to `false`). Note that unpatched GNOME Shell does not yet support multicolor emoji.
+
+[ANSI SGR escape sequences](https://en.wikipedia.org/wiki/ANSI_escape_code#graphics) and [Pango markup](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html) tags may be used for styling. This can be disabled by setting the `ansi` and `useMarkup` attributes, respectively, to `false`.
+
+Backslash escapes such as `\n` and `\t` in the line text are converted to their corresponding characters (newline and tab in this case), which can be prevented by setting the `unescape` attribute to `false`. Newline escapes can be used to create multi-line menu items.
+
+### Line attributes
+
+#### Display
+
+Control how the line is rendered.
+
+| Attribute | Value | Description |
+| --- | --- | --- |
+| `color` | Hex RGB/RGBA or color name | Sets the text color for the item. |
+| `font` | Font name | Sets the font for the item. |
+| `size` | Font size in points | Sets the font size for the item. |
+| `iconName` | Icon name | Sets a menu icon for the item. See the [freedesktop.org icon naming specification](https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html) for a list of valid names. **Argos only.** |
+| `image`, `templateImage` | Base64-encoded image file | Renders an image inside the item. The image is positioned to the left of the text and to the right of the icon. GNOME Shell does not have a concept of "template images", so `image` and `templateImage` are interchangeable in Argos. |
+| `length` | Length in characters | Truncate the line text to the specified number of characters, ellipsizing the truncated part. |
+| `trim` | `true` or `false` | If `false`, preserve leading and trailing whitespace of the line text. |
+| `dropdown` | `true` or `false` | If `false` and the line is a button line (see above), exclude it from being displayed in the dropdown menu. |
+| `alternate` | `true` or `false` | If `true`, the item is hidden by default, and shown in place of the preceding item when the <kbd>Alt</kbd> key is pressed. |
+| `emojize` | `true` or `false` | If `false`, disable substitution of `:emoji_name:` with emoji characters in the line text. |
+| `ansi` | `true` or `false` | If `false`, disable interpretation of ANSI escape sequences in the line text. |
+| `useMarkup` | `true` or `false` | If `false`, disable interpretation of Pango markup in the line text. **Argos only.** |
+| `unescape` | `true` or `false` | If `false`, disable interpretation of backslash escapes such as `\n` in the line text. **Argos only.** |
+
+#### Actions
+
+Define actions to be performed when the user clicks on the line's menu item.
+
+Action attributes are *not* mutually exclusive. Any combination of them may be associated with the same item, and all actions are executed when the item is clicked.
+
+| Attribute | Value | Description |
+| --- | --- | --- |
+| `bash` | `bash` command | Runs a command using `bash` inside a GNOME Terminal window. |
+| `terminal` | `true` or `false` | If `false`, runs the `bash` command in the background (i.e. without opening a terminal window). |
+| `param1`, `param2`, ... | Command line arguments | Arguments to be passed to the `bash` command. *Note: Provided for compatibility with BitBar only. Argos allows placing arguments directy in the command string.* |
+| `href` | URI | Opens a URI in the application registered to handle it. URIs starting with `http://` launch the web browser, while `file://` URIs open the file in its associated default application. |
+| `eval` | JavaScript code | Passes the code to JavaScript's `eval` function. **Argos only.** |
+| `refresh` | `true` or `false` | If `true`, re-runs the plugin, updating its output. |
 
 
 ## BitBar plugins with Argos

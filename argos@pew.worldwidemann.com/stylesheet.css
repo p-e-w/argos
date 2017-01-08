@@ -8,3 +8,7 @@
      taking into account margin around "app-menu-icon") */
   spacing: 6px;
 }
+
+.argos-menu-item-edit {
+  font-size: smaller;
+}

@@ -190,7 +190,9 @@ const ArgosButton = new Lang.Class({
     if (dropdownLines.length > 0)
       this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-    let menuItem = new PopupMenu.PopupMenuItem(this._file.get_basename());
+    let menuItem = new PopupMenu.PopupMenuItem(this._file.get_basename(), {
+      style_class: "argos-menu-item-edit"
+    });
     menuItem.connect("activate", Lang.bind(this, function() {
       Gio.AppInfo.launch_default_for_uri("file://" + this._file.get_path(), null);
     }));

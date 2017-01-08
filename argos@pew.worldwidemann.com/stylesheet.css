@@ -2,3 +2,9 @@
   /* Value from the default GNOME Shell theme (class "popup-menu-item") */
   spacing: 12px;
 }
+
+.panel-button .argos-line-view {
+  /* Value from the default GNOME Shell theme (class "panel-status-menu-box",
+     taking into account margin around "app-menu-icon") */
+  spacing: 6px;
+}

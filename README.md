@@ -1,7 +1,7 @@
 ![Header](https://cloud.githubusercontent.com/assets/2702526/21295125/68218a42-c574-11e6-98ba-6d8add0efb9e.png)
 
 
-## Argos – Create GNOME Shell extensions in seconds
+# Argos – Create GNOME Shell extensions in seconds
 
 [Most GNOME Shell extensions](https://extensions.gnome.org) do one thing: Add a button with a dropdown menu to the panel, displaying information and exposing functionality. Even in its simplest form, creating such an extension is a nontrivial task involving a poorly documented and ever-changing JavaScript API.
 
@@ -126,6 +126,6 @@ By contributing, you agree to release your changes under the same license as the
 
 ## License
 
-Copyright &copy; 2016 Philipp Emanuel Weidmann (<pew@worldwidemann.com>)
+Copyright &copy; 2016-2017 Philipp Emanuel Weidmann (<pew@worldwidemann.com>)
 
 Released under the terms of the [GNU General Public License, version 3](https://gnu.org/licenses/gpl.html)

@@ -24,11 +24,32 @@ let debounceTimeout = null;
 let buttons = [];
 
 function init() {
-  let directoryName = GLib.build_filenamev([GLib.get_user_config_dir(), "argos"]);
+  let directoryPath = GLib.build_filenamev([GLib.get_user_config_dir(), "argos"]);
 
-  directory = Gio.File.new_for_path(directoryName);
-  if (!directory.query_exists(null))
+  directory = Gio.File.new_for_path(directoryPath);
+
+  if (!directory.query_exists(null)) {
     directory.make_directory(null);
+
+    // Create "welcome" script on first run to indicate
+    // that the extension is installed and working
+    let scriptPath = GLib.build_filenamev([directoryPath, "argos.sh"]);
+
+    let scriptContents =
+      '#!/usr/bin/env bash\n\n' +
+      'URL="github.com/p-e-w/argos"\n' +
+      'DIR=$(dirname "$0")\n\n' +
+      'echo "Argos"\n' +
+      'echo "---"\n' +
+      'echo "$URL | iconName=help-faq-symbolic href=\'https://$URL\'"\n' +
+      'echo "$DIR | iconName=folder-symbolic href=\'file://$DIR\'"\n\n';
+
+    GLib.file_set_contents(scriptPath, scriptContents);
+
+    // Running an external program just to make a file executable is ugly,
+    // but Gjs appears to be missing bindings for the "chmod" syscall
+    GLib.spawn_sync(null, ["chmod", "+x", scriptPath], null, GLib.SpawnFlags.SEARCH_PATH, null);
+  }
 
   directoryMonitor = directory.monitor_directory(Gio.FileMonitorFlags.WATCH_MOVES, null);
 }

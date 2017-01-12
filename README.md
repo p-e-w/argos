@@ -81,6 +81,7 @@ Control how the line is rendered.
 | `size` | Font size in points | Sets the font size for the item. |
 | `iconName` | Icon name | Sets a menu icon for the item. See the [freedesktop.org icon naming specification](https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html) for a list of valid names. **Argos only.** |
 | `image`, `templateImage` | Base64-encoded image file | Renders an image inside the item. The image is positioned to the left of the text and to the right of the icon. GNOME Shell does not have a concept of "template images", so `image` and `templateImage` are interchangeable in Argos. |
+| `imageWidth`, `imageHeight` | Width/height in pixels | Sets the dimensions of the image. If only one dimension is specified, the image's original aspect ratio is maintained. **Argos only.** |
 | `length` | Length in characters | Truncate the line text to the specified number of characters, ellipsizing the truncated part. |
 | `trim` | `true` or `false` | If `false`, preserve leading and trailing whitespace of the line text. |
 | `dropdown` | `true` or `false` | If `false` and the line is a button line (see above), exclude it from being displayed in the dropdown menu. |

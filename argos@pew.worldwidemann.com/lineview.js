@@ -56,7 +56,22 @@ const ArgosLineView = new Lang.Class({
         // image and then resize manually afterwards
         let size = Math.max(pixbuf.width, pixbuf.height);
         let texture = St.TextureCache.get_default().load_gicon(null, pixbuf, size, 1);
-        texture.set_size(pixbuf.width, pixbuf.height);
+
+        let aspectRatio = pixbuf.width / pixbuf.height;
+
+        let width = parseInt(line.imageWidth, 10);
+        let height = parseInt(line.imageHeight, 10);
+
+        if (isNaN(width) && isNaN(height)) {
+          width = pixbuf.width;
+          height = pixbuf.height;
+        } else if (isNaN(width)) {
+          width = Math.round(height * aspectRatio);
+        } else if (isNaN(height)) {
+          height = Math.round(width / aspectRatio);
+        }
+
+        texture.set_size(width, height);
 
         this.add_child(texture);
         // Do not stretch the texture to the height of the container

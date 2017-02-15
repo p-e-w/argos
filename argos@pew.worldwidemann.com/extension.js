@@ -16,6 +16,7 @@ const Mainloop = imports.mainloop;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const ArgosButton = Extension.imports.button.ArgosButton;
+const Utilities = Extension.imports.utilities;
 
 let directory;
 let directoryMonitor;
@@ -103,9 +104,10 @@ function addButtons() {
 
   // Iterate in reverse order as buttons are added right-to-left
   for (let i = files.length - 1; i >= 0; i--) {
-    let button = new ArgosButton(files[i]);
+    let settings = Utilities.parseFilename(files[i].get_basename());
+    let button = new ArgosButton(files[i], settings.updateInterval);
     buttons.push(button);
-    Main.panel.addToStatusArea("argos-button-" + i, button);
+    Main.panel.addToStatusArea("argos-button-" + i, button, settings.position, settings.box);
   }
 }
 

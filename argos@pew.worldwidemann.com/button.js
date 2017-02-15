@@ -25,10 +25,11 @@ const ArgosButton = new Lang.Class({
   Name: "ArgosButton",
   Extends: PanelMenu.Button,
 
-  _init: function(file) {
+  _init: function(file, updateInterval) {
     this.parent(0, "", false);
 
     this._file = file;
+    this._updateInterval = updateInterval;
 
     this._lineView = new ArgosLineView();
     this._lineView.setMarkup("<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>");
@@ -42,7 +43,6 @@ const ArgosButton = new Lang.Class({
     this.connect("destroy", Lang.bind(this, this._onDestroy));
 
     this._updateRunning = false;
-    this._updateInterval = Utilities.getUpdateInterval(file);
 
     this._update();
   },

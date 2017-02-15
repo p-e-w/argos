@@ -15,25 +15,50 @@ const Gio = imports.gi.Gio;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const EMOJI = Extension.imports.emoji.EMOJI;
 
-function getUpdateInterval(file) {
-  let updateInterval = null;
+const BOXES = {
+  l: "left",
+  c: "center",
+  r: "right"
+};
 
-  let nameParts = file.get_basename().split(".");
+function parseFilename(filename) {
+  let settings = {
+    updateInterval: null,
+    position: 0,
+    box: "right"
+  };
 
-  if (nameParts.length === 3 && nameParts[1].length >= 2) {
+  let nameParts = filename.split(".");
+
+  let timePart = (nameParts.length >= 3) ? nameParts[nameParts.length - 2] : null;
+  let positionPart = (nameParts.length >= 4) ? nameParts[nameParts.length - 3] : null;
+
+  if (timePart !== null && timePart.length >= 2) {
     // Attempt to parse BitBar refresh time string
-    let number = nameParts[1].substring(0, nameParts[1].length - 1);
-    let unit = nameParts[1].substring(nameParts[1].length - 1);
+    let number = timePart.substring(0, timePart.length - 1);
+    let unit = timePart.substring(timePart.length - 1);
 
     let factorIndex = "smhd".indexOf(unit);
 
     if (factorIndex >= 0 && /^\d+$/.test(number)) {
       let factors = [1, 60, 60 * 60, 24 * 60 * 60];
-      updateInterval = parseInt(number, 10) * factors[factorIndex];
+      settings.updateInterval = parseInt(number, 10) * factors[factorIndex];
     }
   }
 
-  return updateInterval;
+  if (positionPart !== null && positionPart.length >= 1) {
+    let position = positionPart.substring(0, positionPart.length - 1);
+    let box = positionPart.substring(positionPart.length - 1);
+
+    if (BOXES.hasOwnProperty(box) && /^\d*$/.test(position)) {
+      settings.box = BOXES[box];
+
+      if (position.length > 0)
+        settings.position = parseInt(position, 10);
+    }
+  }
+
+  return settings;
 }
 
 // Performs (mostly) BitBar-compatible output line parsing

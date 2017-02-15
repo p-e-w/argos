@@ -149,19 +149,27 @@ Note that the 6.2% CPU usage by `gnome-shell` in the screencast is *not* caused 
 
 Argos monitors the directory `~/.config/argos` for changes. Any executable file found in this directory is considered a plugin. Files whose name starts with a dot (`.`) and files in subdirectories are ignored.
 
-Plugins are run and their standard output is interpreted as described below. For each plugin, a panel button with a dropdown menu is created. The arrangement of buttons from left to right follows the alphabetical order of the files they are generated from. New plugins and edits to existing plugins are automatically detected and reflected in the panel.
+Plugins are run and their standard output is interpreted as described below. For each plugin, a panel button with a dropdown menu is created. The arrangement of buttons from left to right follows the alphabetical order of the files they are generated from (except when a `POSITION` is explicitly specified in the filename). New plugins and edits to existing plugins are automatically detected and reflected in the panel.
 
-### File name format
+### Filename format
 
 A plugin file may be named anything (it only needs to be executable), but if its name has the special form
 
 ```
-NAME.INTERVAL.EXTENSION
+NAME.POSITION.INTERVAL.EXTENSION
 ```
 
-where `INTERVAL` consists of an integer + a period abbreviation such as `s` (seconds), `m` (minutes), `h` (hours) or `d` (days), the plugin is re-run and its output re-rendered every `INTERVAL`.
+where
 
-For example, a script named `plugin.10s.sh` would update every 10 seconds.
+* `POSITION` consists of an integer (optional) + one of `l` (left), `c` (center) or `r` (right), and
+* `INTERVAL` consists of an integer + one of `s` (seconds), `m` (minutes), `h` (hours) or `d` (days)
+
+then
+
+* the dropdown menu button is placed in the panel at `POSITION`, and
+* the plugin is re-run and its output re-rendered every `INTERVAL`.
+
+`POSITION` may be omitted entirely (in which case the button is placed before all other buttons on the right-hand side of the panel) while `INTERVAL` can be left empty. For example, a script named `plugin.10s.sh` is updated every 10 seconds, the button belonging to `plugin.1c..sh` is positioned just right of the GNOME Shell clock, and `plugin.l.1m.sh` is displayed left of the "Activities" button and updated every minute.
 
 ### Output format
 

@@ -22,7 +22,13 @@ More precisely, Argos is a GNOME Shell extension that turns executables' standar
 
 ## Installation
 
-Clone the repository, then copy or symlink the directory `argos@pew.worldwidemann.com` into `~/.local/share/gnome-shell/extensions`. Restart GNOME Shell by pressing <kbd>Alt+F2</kbd>, then entering `r`. On some systems, you may have to manually enable the Argos extension using GNOME Tweak Tool.
+### From the GNOME Shell Extensions website (recommended)
+
+[<img src="https://img.shields.io/badge/extensions.gnome.org-Argos-9999ff.svg" height="30">](https://extensions.gnome.org/extension/1176/argos/)
+
+### Manually
+
+Clone the repository, then copy or symlink the directory `argos@pew.worldwidemann.com` into `~/.local/share/gnome-shell/extensions`. Restart GNOME Shell by pressing <kbd>Alt+F2</kbd>, then entering `r`. On some systems, you may additionally have to enable the Argos extension using GNOME Tweak Tool.
 
 
 ## Examples

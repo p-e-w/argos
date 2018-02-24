@@ -16,7 +16,7 @@ const GdkPixbuf = imports.gi.GdkPixbuf;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 
-const ArgosLineView = new Lang.Class({
+var ArgosLineView = new Lang.Class({
   Name: "ArgosLineView",
   Extends: St.BoxLayout,
 

@@ -18,7 +18,7 @@ const AltSwitcher = imports.ui.status.system.AltSwitcher;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const ArgosLineView = Extension.imports.lineview.ArgosLineView;
 
-const ArgosMenuItem = new Lang.Class({
+var ArgosMenuItem = new Lang.Class({
   Name: "ArgosMenuItem",
   Extends: PopupMenu.PopupBaseMenuItem,
 

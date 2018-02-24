@@ -21,7 +21,7 @@ const ArgosLineView = Extension.imports.lineview.ArgosLineView;
 const ArgosMenuItem = Extension.imports.menuitem.ArgosMenuItem;
 const Utilities = Extension.imports.utilities;
 
-const ArgosButton = new Lang.Class({
+var ArgosButton = new Lang.Class({
   Name: "ArgosButton",
   Extends: PanelMenu.Button,
 

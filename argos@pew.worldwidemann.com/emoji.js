@@ -1,6 +1,6 @@
 // Source: https://github.com/muan/emojilib (simplemap.json)
 
-const EMOJI = {
+var EMOJI = {
   "100": "💯",
   "1234": "🔢",
   "grinning": "😀",

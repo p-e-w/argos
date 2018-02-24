@@ -26,6 +26,8 @@ More precisely, Argos is a GNOME Shell extension that turns executables' standar
 
 [<img src="https://img.shields.io/badge/extensions.gnome.org-Argos-9999ff.svg" height="30">](https://extensions.gnome.org/extension/1176/argos/)
 
+If you have a recent version of GNOME Software, you can also install Argos directly from there by simply searching for it. Note that this method may not always get you the latest release of Argos.
+
 ### Manually
 
 Clone the repository, then copy or symlink the directory `argos@pew.worldwidemann.com` into `~/.local/share/gnome-shell/extensions`. Restart GNOME Shell by pressing <kbd>Alt+F2</kbd>, then entering `r`. On some systems, you may additionally have to enable the Argos extension using GNOME Tweak Tool.
@@ -195,9 +197,9 @@ Lines above the first separator belong to the button itself. If there are multip
 
 Lines below the first separator are rendered as dropdown menu items. Further separators create graphical separator menu items.
 
-Lines beginning with `--` are rendered in a submenu associated with the preceding unindented line. While Argos supports nested submenus *in principle*, GNOME Shell does not render them correctly as of version 3.22.
+Lines beginning with `--` are rendered in a submenu associated with the preceding unindented line. While Argos supports nested submenus *in principle*, GNOME Shell does not render them correctly.
 
-[Emoji codes](http://www.emoji-cheat-sheet.com) like `:horse:` :horse: and `:smile:` :smile: in the line text are replaced with their corresponding Unicode characters (unless the `emojize` attribute is set to `false`). Note that unpatched GNOME Shell does not yet support multicolor emoji.
+[Emoji codes](http://www.emoji-cheat-sheet.com) like `:horse:` :horse: and `:smile:` :smile: in the line text are replaced with their corresponding Unicode characters (unless the `emojize` attribute is set to `false`). Note that multicolor emoji rendering requires GNOME 3.26 or later.
 
 [ANSI SGR escape sequences](https://en.wikipedia.org/wiki/ANSI_escape_code#graphics) and [Pango markup](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html) tags may be used for styling. This can be disabled by setting the `ansi` and `useMarkup` attributes, respectively, to `false`.
 

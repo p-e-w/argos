@@ -1,7 +1,7 @@
 /*
  * Argos - Create GNOME Shell extensions in seconds
  *
- * Copyright (c) 2016-2017 Philipp Emanuel Weidmann <pew@worldwidemann.com>
+ * Copyright (c) 2016-2018 Philipp Emanuel Weidmann <pew@worldwidemann.com>
  *
  * Nemo vir est qui mundum non reddat meliorem.
  *

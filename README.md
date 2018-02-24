@@ -273,6 +273,6 @@ By contributing, you agree to release your changes under the same license as the
 
 ## License
 
-Copyright &copy; 2016-2017 Philipp Emanuel Weidmann (<pew@worldwidemann.com>)
+Copyright &copy; 2016-2018 Philipp Emanuel Weidmann (<pew@worldwidemann.com>)
 
 Released under the terms of the [GNU General Public License, version 3](https://gnu.org/licenses/gpl.html)

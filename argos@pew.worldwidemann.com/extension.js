@@ -52,7 +52,10 @@ function init() {
     GLib.spawn_sync(null, ["chmod", "+x", scriptPath], null, GLib.SpawnFlags.SEARCH_PATH, null);
   }
 
-  directoryMonitor = directory.monitor_directory(Gio.FileMonitorFlags.WATCH_MOVES, null);
+  // WATCH_MOVES requires GLib 2.46 or later
+  let monitorFlags = Gio.FileMonitorFlags.hasOwnProperty("WATCH_MOVES") ?
+    Gio.FileMonitorFlags.WATCH_MOVES : Gio.FileMonitorFlags.SEND_MOVED;
+  directoryMonitor = directory.monitor_directory(monitorFlags, null);
 }
 
 function enable() {

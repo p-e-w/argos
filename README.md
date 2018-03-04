@@ -216,7 +216,7 @@ Control how the line is rendered.
 | `color` | Hex RGB/RGBA or color name | Sets the text color for the item. |
 | `font` | Font name | Sets the font for the item. |
 | `size` | Font size in points | Sets the font size for the item. |
-| `iconName` | Icon name | Sets a menu icon for the item. See the [freedesktop.org icon naming specification](https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html) for a list of valid names. **Argos only.** |
+| `iconName` | Icon name | Sets a menu icon for the item. See the [freedesktop.org icon naming specification](https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html) for a list of names that should work anywhere, or run [gtk3-icon-browser](https://developer.gnome.org/gtk3/unstable/gtk3-icon-browser.html) to see the names of all icons in your current icon theme. **Argos only.** |
 | `image`, `templateImage` | Base64-encoded image file | Renders an image inside the item. The image is positioned to the left of the text and to the right of the icon. GNOME Shell does not have a concept of "template images", so `image` and `templateImage` are interchangeable in Argos. |
 | `imageWidth`, `imageHeight` | Width/height in pixels | Sets the dimensions of the image. If only one dimension is specified, the image's original aspect ratio is maintained. **Argos only.** |
 | `length` | Length in characters | Truncate the line text to the specified number of characters, ellipsizing the truncated part. |

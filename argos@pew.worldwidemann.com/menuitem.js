@@ -49,6 +49,12 @@ var ArgosMenuItem = new Lang.Class({
       this.connect("activate", Lang.bind(this, function() {
         let activeLine = (altSwitcher === null) ? line : altSwitcher.actor.get_child().line;
 
+        if (activeLine.hasOwnProperty("href"))
+          Gio.AppInfo.launch_default_for_uri(activeLine.href, null);
+
+        if (activeLine.hasOwnProperty("eval"))
+          eval(activeLine.eval);
+
         if (activeLine.hasOwnProperty("bash")) {
           let argv = [];
 
@@ -60,17 +66,18 @@ var ArgosMenuItem = new Lang.Class({
             argv = ["gnome-terminal", "-e", "bash -c " + GLib.shell_quote(activeLine.bash + "; exec bash")];
           }
 
-          GLib.spawn_async(null, argv, null, GLib.SpawnFlags.SEARCH_PATH, null);
-        }
+          let [success, pid] = GLib.spawn_async(
+            null, argv, null, GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD, null);
 
-        if (activeLine.hasOwnProperty("href"))
-          Gio.AppInfo.launch_default_for_uri(activeLine.href, null);
-
-        if (activeLine.hasOwnProperty("eval"))
-          eval(activeLine.eval);
-
-        if (activeLine.refresh === "true")
+          if (success) {
+            GLib.child_watch_add(GLib.PRIORITY_DEFAULT_IDLE, pid, function() {
+              if (activeLine.refresh === "true")
+                button.update();
+            });
+          }
+        } else if (activeLine.refresh === "true") {
           button.update();
+        }
       }));
     }
   }

@@ -23,6 +23,7 @@ const BOXES = {
 
 function parseFilename(filename) {
   let settings = {
+    updateOnOpen: false,
     updateInterval: null,
     position: 0,
     box: "right"
@@ -30,13 +31,18 @@ function parseFilename(filename) {
 
   let nameParts = filename.split(".");
 
-  let timePart = (nameParts.length >= 3) ? nameParts[nameParts.length - 2] : null;
+  let updatePart = (nameParts.length >= 3) ? nameParts[nameParts.length - 2] : null;
   let positionPart = (nameParts.length >= 4) ? nameParts[nameParts.length - 3] : null;
 
-  if (timePart !== null && timePart.length >= 2) {
+  if (updatePart !== null && updatePart.endsWith("+")) {
+    settings.updateOnOpen = true;
+    updatePart = updatePart.substring(0, updatePart.length - 1);
+  }
+
+  if (updatePart !== null && updatePart.length >= 2) {
     // Attempt to parse BitBar refresh time string
-    let number = timePart.substring(0, timePart.length - 1);
-    let unit = timePart.substring(timePart.length - 1);
+    let number = updatePart.substring(0, updatePart.length - 1);
+    let unit = updatePart.substring(updatePart.length - 1);
 
     let factorIndex = "smhd".indexOf(unit);
 

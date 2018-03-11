@@ -25,11 +25,11 @@ var ArgosButton = new Lang.Class({
   Name: "ArgosButton",
   Extends: PanelMenu.Button,
 
-  _init: function(file, updateInterval) {
+  _init: function(file, settings) {
     this.parent(0, "", false);
 
     this._file = file;
-    this._updateInterval = updateInterval;
+    this._updateInterval = settings.updateInterval;
 
     this._lineView = new ArgosLineView();
     this._lineView.setMarkup("<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>");
@@ -45,6 +45,13 @@ var ArgosButton = new Lang.Class({
     this._updateRunning = false;
 
     this._update();
+
+    if (settings.updateOnOpen) {
+      this.menu.connect("open-state-changed", Lang.bind(this, function(menu, open) {
+        if (open)
+          this.update();
+      }));
+    }
   },
 
   _onDestroy: function() {

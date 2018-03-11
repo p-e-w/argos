@@ -108,7 +108,7 @@ function addButtons() {
   // Iterate in reverse order as buttons are added right-to-left
   for (let i = files.length - 1; i >= 0; i--) {
     let settings = Utilities.parseFilename(files[i].get_basename());
-    let button = new ArgosButton(files[i], settings.updateInterval);
+    let button = new ArgosButton(files[i], settings);
     buttons.push(button);
     Main.panel.addToStatusArea("argos-button-" + i, button, settings.position, settings.box);
   }

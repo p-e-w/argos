@@ -80,8 +80,12 @@ var ArgosButton = new Lang.Class({
 
     this._updateRunning = true;
 
+    let envp = GLib.get_environ();
+    envp.push("ARGOS_VERSION=2");
+    envp.push("ARGOS_MENU_OPEN=" + (this.menu.isOpen ? "true" : "false"));
+
     try {
-      Utilities.spawnWithCallback(null, [this._file.get_path()], null, 0, null,
+      Utilities.spawnWithCallback(null, [this._file.get_path()], envp, 0, null,
         Lang.bind(this, function(standardOutput) {
           this._updateRunning = false;
 

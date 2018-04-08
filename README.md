@@ -133,7 +133,7 @@ And there you have it: A working clone of [a full-blown GNOME Shell extension](h
 
 Argos basically pipes standard output into a panel menu. This makes for some very cool plugins like this `top` output viewer:
 
-#### `top.3s.sh`
+#### `top.3s+.sh`
 
 ```bash
 #!/usr/bin/env bash
@@ -141,16 +141,20 @@ Argos basically pipes standard output into a panel menu. This makes for some ver
 echo "top"
 echo "---"
 
-# http://stackoverflow.com/a/14853319
-TOP_OUTPUT=$(top -b -n 1 | head -n 20 | awk 1 ORS="\\\\n")
-echo "$TOP_OUTPUT | font=monospace bash=top"
+if [ "$ARGOS_MENU_OPEN" == "true" ]; then
+  # http://stackoverflow.com/a/14853319
+  TOP_OUTPUT=$(top -b -n 1 | head -n 20 | awk 1 ORS="\\\\n")
+  echo "$TOP_OUTPUT | font=monospace bash=top"
+else
+  echo "Loading..."
+fi
 ```
 
 ![top Viewer](https://cloud.githubusercontent.com/assets/2702526/21953525/e30d340e-da5f-11e6-9ed3-cc10a067d515.gif)
 
 It's `top` at your fingertips! Of course, this approach works with any other terminal program as well.
 
-Note that the 6.2% CPU usage by `gnome-shell` in the screencast is *not* caused by the plugin or Argos – it was deliberately created for this screencast to demonstrate some `top` activity. Idle CPU usage with this plugin is actually below 1%.
+Note that the plugin checks the [`ARGOS_MENU_OPEN` environment variable](#environment-variables) to ensure `top` is run only if the dropdown menu is visible, while the [`+` in the filename](#filename-format) forces a re-run whenever the user opens the menu. This pattern makes output available immediately when it is needed, but keeps idle resource consumption of the plugin near zero.
 
 
 ## Usage
@@ -243,6 +247,15 @@ Action attributes are *not* mutually exclusive. Any combination of them may be a
 | `href` | URI | Opens a URI in the application registered to handle it. URIs starting with `http://` launch the web browser, while `file://` URIs open the file in its associated default application. |
 | `eval` | JavaScript code | Passes the code to JavaScript's `eval` function. **Argos only.** |
 | `refresh` | `true` or `false` | If `true`, re-runs the plugin, updating its output. |
+
+### Environment variables
+
+Plugin executables are run with the following special environment variables set:
+
+| Name | Value |
+| --- | --- |
+| `ARGOS_VERSION` | Version number of the Argos extension. The presence of this environment variable can also be used to determine that the plugin is actually running in Argos, rather than BitBar or [kargos](https://github.com/lipido/kargos). |
+| `ARGOS_MENU_OPEN` | `true` if the dropdown menu was open at the time the plugin was run, and `false` otherwise. |
 
 
 ## BitBar plugins with Argos

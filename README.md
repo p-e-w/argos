@@ -273,7 +273,7 @@ These screenshots show how some scripts from the BitBar plugin repository look w
 
 ## Acknowledgments
 
-GNOME Shell is a difficult platform to develop for. The [Gjs documentation](https://people.gnome.org/~gcampagna/docs/) hasn't been updated in three years and is missing important classes. Once again, [**Valadoc**](https://valadoc.org) saved the day for me. While not fully identical to the Gjs API, Valadoc is the best manual for GNOME on the web today.
+GNOME Shell is a difficult platform to develop for. At the time this project was started, the Gjs documentation hadn't been updated in three years and was missing important classes (new documentation has [since appeared](https://ptomato.wordpress.com/2017/05/22/the-gjs-documentation-is-back/)). Once again, [**Valadoc**](https://valadoc.org) saved the day for me. While not fully identical to the Gjs API, Valadoc is the best manual for GNOME on the web today.
 
 Argos includes [**emojilib**](https://github.com/muan/emojilib)'s emoji name/character mappings. It's wonderful that such a comprehensive and well-maintained library is so easily available.
 

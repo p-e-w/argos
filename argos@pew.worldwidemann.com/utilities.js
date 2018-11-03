@@ -74,6 +74,10 @@ function parseLine(lineString) {
 
   let separatorIndex = lineString.indexOf("|");
 
+  while(lineString.substr(separatorIndex-1,1) == '\\'){
+      separatorIndex = lineString.indexOf("|", separatorIndex+1);
+  }
+
   if (separatorIndex >= 0) {
     let attributes = [];
     try {

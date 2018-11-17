@@ -72,16 +72,13 @@ function parseFilename(filename) {
 function parseLine(lineString) {
   let line = {};
 
-  let separatorIndex = lineString.indexOf("|");
+  let separatedLine = GLib.regex_split_simple("(?<!\\\\)\\|", lineString, 0, 0);
+  line.text = separatedLine.shift();
 
-  while(lineString.substr(separatorIndex-1,1) == '\\'){
-      separatorIndex = lineString.indexOf("|", separatorIndex+1);
-  }
-
-  if (separatorIndex >= 0) {
+  if (separatedLine.length > 0) {
     let attributes = [];
     try {
-      attributes = GLib.shell_parse_argv(lineString.substring(separatorIndex + 1))[1];
+      attributes = GLib.shell_parse_argv(separatedLine.join('|'))[1];
     } catch (error) {
       log("Unable to parse attributes for line '" + lineString + "': " + error);
     }
@@ -97,12 +94,6 @@ function parseLine(lineString) {
           line[name] = value;
       }
     }
-
-    line.text = lineString.substring(0, separatorIndex);
-
-  } else {
-    // Line has no attributes
-    line.text = lineString;
   }
 
   let leadingDashes = line.text.search(/[^-]/);

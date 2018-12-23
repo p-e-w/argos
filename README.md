@@ -1,3 +1,4 @@
+[<img width="250" align="right" src="https://gitlab.gnome.org/Teams/Engagement/marketing-design/uploads/82ba0c5d9fe7e103da3c3ee78b77d117/GNOMEExtension-button.svg">](https://extensions.gnome.org/extension/1176/argos/)
 <h1 align="center">Argos</h1>
 <h3 align="center">Create GNOME Shell extensions in seconds</h3>
 <br>

@@ -63,7 +63,7 @@ var ArgosMenuItem = new Lang.Class({
           } else {
             // Run bash immediately after executing the command to keep the terminal window open
             // (see http://stackoverflow.com/q/3512055)
-            argv = ["gnome-terminal", "--", "bash", "-c", activeLine.bash + "; exec $SHELL"];
+            argv = ["gnome-terminal", "--", "bash", "-c", activeLine.bash + "; exec ${SHELL:=bash}"];
           }
 
           let [success, pid] = GLib.spawn_async(

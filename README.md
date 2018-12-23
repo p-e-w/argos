@@ -198,7 +198,7 @@ All attributes are optional, so the most basic plugins simply print lines consis
 
 Lines containing only dashes (`---`) are *separators*.
 
-Lines above the first separator belong to the button itself. If there are multiple such lines, they are displayed in succession, each of them for 3 seconds before switching to the next. Additionally, all button lines get a dropdown menu item, except if their `dropdown` attribute is set to `false`.
+Lines above the first separator belong to the button itself. If there are multiple such lines, they are displayed in succession, each of them for 3 seconds before switching to the next (timeout can be configured with `timeout` attribute). Additionally, all button lines get a dropdown menu item, except if their `dropdown` attribute is set to `false`.
 
 Lines below the first separator are rendered as dropdown menu items. Further separators create graphical separator menu items.
 
@@ -232,6 +232,7 @@ Control how the line is rendered.
 | `ansi` | `true` or `false` | If `false`, disable interpretation of ANSI escape sequences in the line text. |
 | `useMarkup` | `true` or `false` | If `false`, disable interpretation of Pango markup in the line text. **Argos only.** |
 | `unescape` | `true` or `false` | If `false`, disable interpretation of backslash escapes such as `\n` in the line text. **Argos only.** |
+| `timeout` | Timeout in seconds | If the line is a button line, it sets how long an entry is visible (defaults to 3) **Argos only.** |
 
 #### Actions
 

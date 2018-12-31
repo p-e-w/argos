@@ -1,4 +1,3 @@
-[<img width="250" align="right" src="https://gitlab.gnome.org/Teams/Engagement/marketing-design/uploads/82ba0c5d9fe7e103da3c3ee78b77d117/GNOMEExtension-button.svg">](https://extensions.gnome.org/extension/1176/argos/)
 <h1 align="center">Argos</h1>
 <h3 align="center">Create GNOME Shell extensions in seconds</h3>
 <br>
@@ -23,9 +22,9 @@ More precisely, Argos is a GNOME Shell extension that turns executables' standar
 
 ## Installation
 
-### From the GNOME Shell Extensions website (recommended)
+[<img height="100" align="right" src="https://gitlab.gnome.org/Teams/Engagement/marketing-design/uploads/82ba0c5d9fe7e103da3c3ee78b77d117/GNOMEExtension-button.svg">](https://extensions.gnome.org/extension/1176/argos/)
 
-[<img src="https://img.shields.io/badge/extensions.gnome.org-Argos-9999ff.svg" height="30">](https://extensions.gnome.org/extension/1176/argos/)
+### From the GNOME Shell Extensions website (recommended)
 
 If you have a recent version of GNOME Software, you can also install Argos directly from there by simply searching for it. Note that this method may not always get you the latest release of Argos.
 

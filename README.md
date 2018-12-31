@@ -232,7 +232,6 @@ Control how the line is rendered.
 | `ansi` | `true` or `false` | If `false`, disable interpretation of ANSI escape sequences in the line text. |
 | `useMarkup` | `true` or `false` | If `false`, disable interpretation of Pango markup in the line text. **Argos only.** |
 | `unescape` | `true` or `false` | If `false`, disable interpretation of backslash escapes such as `\n` in the line text. **Argos only.** |
-| `timeout` | Timeout in seconds | If the line is a button line, it sets how long an entry is visible (defaults to 3) **Argos only.** |
 
 #### Actions
 

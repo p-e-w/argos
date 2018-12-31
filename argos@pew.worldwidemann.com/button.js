@@ -59,11 +59,8 @@ var ArgosButton = new Lang.Class({
 
     if (this._updateTimeout !== null)
       Mainloop.source_remove(this._updateTimeout);
-    if (this._cycleTimeouts.length > 0){
-      this._cycleTimeouts.forEach(cycle => Mainloop.source_remove(cycle));
-      this._cycleTimeouts = [];
-    }
 
+    this._cycleTimeouts.forEach(cycle => Mainloop.source_remove(cycle));
     this.menu.removeAll();
   },
 
@@ -133,10 +130,8 @@ var ArgosButton = new Lang.Class({
 
     this.menu.removeAll();
 
-    if (this._cycleTimeouts.length > 0) {
-      this._cycleTimeouts.forEach(cycle => Mainloop.source_remove(cycle));
-      this._cycleTimeouts = [];
-    }
+    this._cycleTimeouts.forEach(cycle => Mainloop.source_remove(cycle));
+    this._cycleTimeouts = [];
 
     if (buttonLines.length === 0) {
       this._lineView.setMarkup(GLib.markup_escape_text(this._file.get_basename(), -1));

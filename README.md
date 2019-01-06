@@ -22,7 +22,7 @@ More precisely, Argos is a GNOME Shell extension that turns executables' standar
 
 ## Installation
 
-[<img height="100" align="right" src="https://gitlab.gnome.org/Teams/Engagement/marketing-design/uploads/82ba0c5d9fe7e103da3c3ee78b77d117/GNOMEExtension-button.svg">](https://extensions.gnome.org/extension/1176/argos/)
+[<img height="100" src="https://github.com/andyholmes/gnome-shell-extensions-badge/blob/master/get-it-on-ego.svg">](https://extensions.gnome.org/extension/1176/argos/)
 
 ### From the GNOME Shell Extensions website (recommended)
 

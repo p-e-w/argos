@@ -18,14 +18,11 @@ const AltSwitcher = imports.ui.status.system.AltSwitcher;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const ArgosLineView = Extension.imports.lineview.ArgosLineView;
 
-var ArgosMenuItem = new Lang.Class({
-  Name: "ArgosMenuItem",
-  Extends: PopupMenu.PopupBaseMenuItem,
-
-  _init: function(button, line, alternateLine) {
+var ArgosMenuItem = class extends PopupMenu.PopupBaseMenuItem {
+  constructor(button, line, alternateLine) {
     let hasAction = line.hasAction || (typeof alternateLine !== "undefined" && alternateLine.hasAction);
 
-    this.parent({
+    super({
       activate: hasAction,
       hover: hasAction,
       can_focus: hasAction
@@ -81,4 +78,4 @@ var ArgosMenuItem = new Lang.Class({
       }));
     }
   }
-});
+};

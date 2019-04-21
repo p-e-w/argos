@@ -55,7 +55,7 @@ var ArgosLineView = new Lang.Class({
         // actual dimensions are, so we request a size that can hold all pixels of the
         // image and then resize manually afterwards
         let size = Math.max(pixbuf.width, pixbuf.height);
-        let texture = St.TextureCache.get_default().load_gicon(null, pixbuf, size, 1);
+        let texture = St.TextureCache.get_default().load_gicon(null, pixbuf, size, 1, 1.0);
 
         let aspectRatio = pixbuf.width / pixbuf.height;
 

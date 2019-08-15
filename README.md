@@ -206,7 +206,7 @@ Lines beginning with `--` are rendered in a submenu associated with the precedin
 
 [Emoji codes](http://www.emoji-cheat-sheet.com) like `:horse:` :horse: and `:smile:` :smile: in the line text are replaced with their corresponding Unicode characters (unless the `emojize` attribute is set to `false`). Note that multicolor emoji rendering requires GNOME 3.26 or later.
 
-[ANSI SGR escape sequences](https://en.wikipedia.org/wiki/ANSI_escape_code#graphics) and [Pango markup](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html) tags may be used for styling. This can be disabled by setting the `ansi` and `useMarkup` attributes, respectively, to `false`.
+[ANSI SGR escape sequences](https://en.wikipedia.org/wiki/ANSI_escape_code#graphics) and [Pango markup](https://developer.gnome.org/pygtk/stable/pango-markup-language.html) tags may be used for styling. This can be disabled by setting the `ansi` and `useMarkup` attributes, respectively, to `false`.
 
 Backslash escapes such as `\n` and `\t` in the line text are converted to their corresponding characters (newline and tab in this case), which can be prevented by setting the `unescape` attribute to `false`. Newline escapes can be used to create multi-line menu items.
 

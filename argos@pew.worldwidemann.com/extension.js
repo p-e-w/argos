@@ -23,18 +23,24 @@ let directoryMonitor;
 let directoryChangedId;
 let debounceTimeout = null;
 let buttons = [];
+let systemDirectory;
+let systemDirectoryMonitor;
+let systemDirectoryChangedId;
+let systemDirectoryExists = false;
 
 function init() {
-  let directoryPath = GLib.build_filenamev([GLib.get_user_config_dir(), "argos"]);
+  const userDirectoryPath = GLib.build_filenamev([GLib.get_user_config_dir(), "argos"]);
+  const systemDirectoryPath = GLib.build_filenamev(["/etc", "argos"]);
 
-  directory = Gio.File.new_for_path(directoryPath);
+  directory = Gio.File.new_for_path(userDirectoryPath);
+  systemDirectory = Gio.File.new_for_path(systemDirectoryPath);
 
   if (!directory.query_exists(null)) {
     directory.make_directory(null);
 
     // Create "welcome" script on first run to indicate
     // that the extension is installed and working
-    let scriptPath = GLib.build_filenamev([directoryPath, "argos.sh"]);
+    let scriptPath = GLib.build_filenamev([userDirectoryPath, "argos.sh"]);
 
     let scriptContents =
       '#!/usr/bin/env bash\n\n' +
@@ -56,33 +62,38 @@ function init() {
   let monitorFlags = Gio.FileMonitorFlags.hasOwnProperty("WATCH_MOVES") ?
     Gio.FileMonitorFlags.WATCH_MOVES : Gio.FileMonitorFlags.SEND_MOVED;
   directoryMonitor = directory.monitor_directory(monitorFlags, null);
+  systemDirectoryMonitor = systemDirectory.monitor_directory(monitorFlags, null);
 }
 
 function enable() {
   addButtons();
 
-  directoryChangedId = directoryMonitor.connect("changed", function(monitor, file, otherFile, eventType) {
-    removeButtons();
-
-    // Some high-level file operations trigger multiple "changed" events in rapid succession.
-    // Debouncing groups them together to avoid unnecessary updates.
-    if (debounceTimeout === null) {
-      debounceTimeout = Mainloop.timeout_add(100, function() {
-        debounceTimeout = null;
-        addButtons();
-        return false;
-      });
-    }
-  });
+  directoryChangedId = directoryMonitor.connect("changed", directoryChanged);
+  systemDirectoryChangedId = systemDirectoryMonitor.connect("changed", directoryChanged);
 }
 
 function disable() {
   directoryMonitor.disconnect(directoryChangedId);
+  systemDirectoryMonitor.disconnect(systemDirectoryChangedId);
 
   if (debounceTimeout !== null)
     Mainloop.source_remove(debounceTimeout);
 
   removeButtons();
+}
+
+function directoryChanged(monitor, file, otherFile, eventType) {
+  removeButtons();
+
+  // Some high-level file operations trigger multiple "changed" events in rapid succession.
+  // Debouncing groups them together to avoid unnecessary updates.
+  if (debounceTimeout === null) {
+    debounceTimeout = Mainloop.timeout_add(100, function() {
+      debounceTimeout = null;
+      addButtons();
+      return false;
+    });
+  }
 }
 
 function addButtons() {
@@ -98,6 +109,20 @@ function addButtons() {
       !GLib.file_test(file.get_path(), GLib.FileTest.IS_DIR) &&
       !file.get_basename().startsWith(".")) {
       files.push(file);
+    }
+  }
+
+  if (systemDirectory.query_exists(null)) {
+    let systemEnumerator = systemDirectory.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NONE, null);
+
+    while ((fileInfo = systemEnumerator.next_file(null)) !== null) {
+      let file = systemEnumerator.get_child(fileInfo);
+
+      if (GLib.file_test(file.get_path(), GLib.FileTest.IS_EXECUTABLE) &&
+          !GLib.file_test(file.get_path(), GLib.FileTest.IS_DIR) &&
+          !file.get_basename().startsWith(".")) {
+          files.push(file);
+      }
     }
   }
 

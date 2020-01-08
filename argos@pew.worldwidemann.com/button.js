@@ -33,7 +33,7 @@ var ArgosButton = new Lang.Class({
 
     this._lineView = new ArgosLineView();
     this._lineView.setMarkup("<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>");
-    this.actor.add_actor(this._lineView);
+    this.add_actor(this._lineView);
 
     this._isDestroyed = false;
 
@@ -136,9 +136,9 @@ var ArgosButton = new Lang.Class({
       this._cycleTimeout = null;
     }
 
-    this.actor.visible = buttonLines.length > 0 || !dropdownMode;
+    this.visible = buttonLines.length > 0 || !dropdownMode;
 
-    if (!this.actor.visible)
+    if (!this.visible)
       return;
 
     if (buttonLines.length === 0) {

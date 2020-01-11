@@ -54,9 +54,6 @@ var ArgosLineView = new Lang.Class({
         // TextureCache.load_gicon returns a square texture no matter what the Pixbuf's
         // actual dimensions are, so we request a size that can hold all pixels of the
         // image and then resize manually afterwards
-        let size = Math.max(pixbuf.width, pixbuf.height);
-        let texture = St.TextureCache.get_default().load_gicon(null, pixbuf, size, 1, 1.0);
-
         let aspectRatio = pixbuf.width / pixbuf.height;
 
         let width = parseInt(line.imageWidth, 10);
@@ -71,11 +68,20 @@ var ArgosLineView = new Lang.Class({
           height = Math.round(width / aspectRatio);
         }
 
+        // Scale icon when display is scaled
+        let themeContext = St.ThemeContext.get_for_stage(global.stage);
+        // TODO: themeContext.connect('notify::scale-factor', ...) to redraw icon when scale factor changes
+        let scaleFactor = themeContext.scale_factor;
+        height *= scaleFactor;
+        width *= scaleFactor;
+
+        let texture = St.TextureCache.get_default().load_gicon(null, pixbuf, height, 1, 1.0);
         texture.set_size(width, height);
 
-        this.add_child(texture);
         // Do not stretch the texture to the height of the container
-        this.child_set_property(texture, "y-fill", false);
+        texture.set_y_align(Clutter.ActorAlign.CENTER);
+
+        this.add_child(texture);
       } catch (error) {
         log("Unable to load image from Base64 representation: " + error);
       }

@@ -9,8 +9,11 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
+const Lang = imports.lang;
+const GObject = imports.gi.GObject;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
+const Config = imports.misc.config;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const EMOJI = Extension.imports.emoji.EMOJI;
@@ -272,6 +275,12 @@ function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, call
   });
 }
 
+// 3.36.1 -> 33601
+const shellVersion = Config.PACKAGE_VERSION.split(".").map(Number).reduce(
+  function(a, x) {
+    return 100 * a + x;
+  });
+
 function readStream(stream, callback) {
   stream.read_line_async(GLib.PRIORITY_LOW, null, function(source, result) {
     let [line] = source.read_line_finish(result);
@@ -283,4 +292,34 @@ function readStream(stream, callback) {
       readStream(source, callback);
     }
   });
+}
+function makeSimpleClass(BaseClass, getSuperArgs, initFn, name) {
+  if (shellVersion < 33200) {
+    return new Lang.Class({
+      Name: name,
+      Extends: BaseClass,
+      _init: function(...args) {
+	this.parent(getSuperArgs(...args));
+	initFn.bind(this)(...args);
+      }
+    });
+  } else if (shellVersion < 33400) {
+    return class extends BaseClass {
+      constructor(...args) {
+	super(getSuperArgs(...args));
+	initFn.bind(this)(...args);
+      }
+    }
+  } else {
+    return GObject.registerClass(
+      {
+	GTypeName: name
+      },
+      class extends BaseClass {
+	_init(...args) {
+	  super._init(getSuperArgs(...args));
+	  initFn.bind(this)(...args);
+	}
+      });
+  }
 }

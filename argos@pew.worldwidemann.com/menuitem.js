@@ -17,16 +17,15 @@ const AltSwitcher = imports.ui.status.system.AltSwitcher;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const ArgosLineView = Extension.imports.lineview.ArgosLineView;
+const Utilities = Extension.imports.utilities;
 
-var ArgosMenuItem = class extends PopupMenu.PopupBaseMenuItem {
-  constructor(button, line, alternateLine) {
-    let hasAction = line.hasAction || (typeof alternateLine !== "undefined" && alternateLine.hasAction);
-
-    super({
-      activate: hasAction,
-      hover: hasAction,
-      can_focus: hasAction
-    });
+// "constructor" aka "init function" for ArgosMenuItem.
+// Defined as ordinary function, referencing "this"; these references will
+// be resolved by later bind() calls.
+// Utilities.MakeSimpleClass() is used below to actually define the class.
+const _ArgosMenuItem_init = function(button, line, alternateLine) {
+    let hasAction = line.hasAction ||
+	(typeof alternateLine !== "undefined" && alternateLine.hasAction);
 
     let altSwitcher = null;
 
@@ -77,5 +76,24 @@ var ArgosMenuItem = class extends PopupMenu.PopupBaseMenuItem {
         }
       }));
     }
-  }
-};
+}
+
+// Helper for the init function. This function is passed the same arguments
+// as the constuctor and returns an object to be passed to the superclass
+// constructor / init function.
+const _ArgosMenuItem_superArg = function(button, line, alternateLine) {
+  let hasAction = line.hasAction ||
+      (typeof alternateLine !== "undefined" && alternateLine.hasAction);
+
+  return {
+    activate: hasAction,
+    hover: hasAction,
+    can_focus: hasAction
+  };
+}
+
+var ArgosMenuItem = Utilities.makeSimpleClass(
+  PopupMenu.PopupBaseMenuItem,
+  _ArgosMenuItem_superArg,
+  _ArgosMenuItem_init,
+  "ArgosMenuItem");

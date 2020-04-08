@@ -24,6 +24,7 @@ const BOXES = {
 function parseFilename(filename) {
   let settings = {
     updateOnOpen: false,
+    updateOnClose: true,
     updateInterval: null,
     position: 0,
     box: "right"
@@ -35,6 +36,12 @@ function parseFilename(filename) {
   let positionPart = (nameParts.length >= 4) ? nameParts[nameParts.length - 3] : null;
 
   if (updatePart !== null && updatePart.endsWith("+")) {
+    settings.updateOnOpen = true;
+    updatePart = updatePart.substring(0, updatePart.length - 1);
+  }
+
+  if (updatePart !== null && updatePart.endsWith("-")) {
+    settings.updateOnClose = false;
     settings.updateOnOpen = true;
     updatePart = updatePart.substring(0, updatePart.length - 1);
   }

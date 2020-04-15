@@ -191,8 +191,10 @@ var ArgosButton = new Lang.Class({
         menuItem.actor.insert_child_below(lineView, menuItem.label);
         menuItem.label.visible = false;
         menus[dropdownLines[i + 1].menuLevel] = menuItem.menu;
-      } else if ((i + 1) < dropdownLines.length && dropdownLines[i + 1].menuLevel === dropdownLines[i].menuLevel &&
-        dropdownLines[i + 1].alternate === "true") {
+      } else if ((i + 1) < dropdownLines.length &&
+		 dropdownLines[i + 1].menuLevel === dropdownLines[i].menuLevel &&
+		 dropdownLines[i + 1].hasOwnProperty("alternate") &&
+		 dropdownLines[i + 1].alternate === "true") {
         menuItem = new ArgosMenuItem(this, dropdownLines[i], dropdownLines[i + 1]);
         // Skip alternate line
         i++;

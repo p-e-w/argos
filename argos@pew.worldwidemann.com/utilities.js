@@ -132,20 +132,20 @@ function parseLine(lineString) {
 
   line.markup = line.text;
 
-  if (line.unescape !== "false")
+  if (!line.hasOwnProperty("unescape") || line.unescape !== "false")
     line.markup = GLib.strcompress(line.markup);
 
-  if (line.emojize !== "false") {
+  if (!line.hasOwnProperty("emojize") || line.emojize !== "false") {
     line.markup = line.markup.replace(/:([\w+-]+):/g, function(match, emojiName) {
       emojiName = emojiName.toLowerCase();
       return EMOJI.hasOwnProperty(emojiName) ? EMOJI[emojiName] : match;
     });
   }
 
-  if (line.trim !== "false")
+  if (!line.hasOwnProperty("trim") || line.trim !== "false")
     line.markup = line.markup.trim();
 
-  if (line.useMarkup === "false") {
+  if (line.hasOwnProperty("useMarkup") && line.useMarkup === "false") {
     line.markup = GLib.markup_escape_text(line.markup, -1);
     // Restore escaped ESC characters (needed for ANSI sequences)
     line.markup = line.markup.replace("&#x1b;", "\x1b");
@@ -153,7 +153,7 @@ function parseLine(lineString) {
 
   // Note that while it is possible to format text using a combination of Pango markup
   // and ANSI escape sequences, lines like "<b>ABC \e[1m DEF</b>" lead to unmatched tags
-  if (line.ansi !== "false")
+  if (!line.hasOwnProperty("ansi") || line.ansi !== "false")
     line.markup = ansiToMarkup(line.markup);
 
   if (markupAttributes.length > 0)
@@ -170,7 +170,8 @@ function parseLine(lineString) {
   }
 
   line.hasAction = line.hasOwnProperty("bash") || line.hasOwnProperty("href") ||
-    line.hasOwnProperty("eval") || line.refresh === "true";
+	line.hasOwnProperty("eval") || 
+	(line.hasOwnProperty("refresh") && line.refresh === "true");
 
   return line;
 }

@@ -288,7 +288,10 @@ function readStream(stream, callback) {
     if (line === null) {
       callback(null);
     } else {
-      callback(imports.byteArray.toString(line) + "\n");
+      if (shellVersion <= 33400)
+	callback(String(line) + "\n");
+      else
+	callback(imports.byteArray.toString(line) + "\n");
       readStream(source, callback);
     }
   });

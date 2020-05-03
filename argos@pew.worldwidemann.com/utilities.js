@@ -293,6 +293,14 @@ function readStream(stream, callback) {
     }
   });
 }
+
+function getActor(obj) {
+  if (shellVersion >= 33400)
+    return obj;
+  else
+    return obj.actor;
+}
+
 function makeSimpleClass(BaseClass, getSuperArgs, initFn, name) {
   if (shellVersion < 33200) {
     return new Lang.Class({

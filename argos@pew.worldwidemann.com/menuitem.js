@@ -13,11 +13,11 @@ const Lang = imports.lang;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const PopupMenu = imports.ui.popupMenu;
-const AltSwitcher = imports.ui.status.system.AltSwitcher;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const ArgosLineView = Extension.imports.lineview.ArgosLineView;
 const Utilities = Extension.imports.utilities;
+const AltSwitcher = Utilities.AltSwitcher;
 
 // "constructor" aka "init function" for ArgosMenuItem.
 // Defined as ordinary function, referencing "this"; these references will

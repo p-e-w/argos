@@ -32,13 +32,13 @@ const _ArgosMenuItem_init = function(button, line, alternateLine) {
     let lineView = new ArgosLineView(line);
 
     if (typeof alternateLine === "undefined") {
-      this.actor.add_child(lineView);
+      Utilities.getActor(this).add_child(lineView);
     } else {
       let alternateLineView = new ArgosLineView(alternateLine);
       altSwitcher = new AltSwitcher(lineView, alternateLineView);
       lineView.visible = true;
       alternateLineView.visible = true;
-      this.actor.add_child(altSwitcher.actor);
+      Utilities.getActor(this).add_child(altSwitcher.actor);
     }
 
     if (hasAction) {

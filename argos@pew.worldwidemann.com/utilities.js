@@ -278,11 +278,51 @@ function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, call
   });
 }
 
-// 3.36.1 -> 33601
-const shellVersion = Config.PACKAGE_VERSION.split(".").map(Number).reduce(
-  function(a, x) {
-    return 100 * a + x;
-  });
+function getShellVersion(str) {
+
+    let v = str.split(".");
+    let n = 0;
+
+    if (v.length == 2) {
+	// GNOME 40 and newer versioning scheme
+	// https://discourse.gnome.org/t/new-gnome-versioning-scheme/4235
+	// must be > 3.x.y with x <= 38
+	// 40.alpha -> 33997
+	// 41.beta  -> 34098
+	// 41.rc    -> 34099
+	// 41.0     -> 34100
+	// 40.1     -> 34001
+	let testReleases = new Map([["alpha", -3],
+				    ["beta",  -2],
+				    ["rc",    -1]]);
+	let minor = testReleases.get(v[1]);
+	let major = Number(v[0]);
+
+	if (typeof(minor) == "undefined") {
+	    minor = Number(v[1]);
+	}
+
+	if (major >= 40)
+	    n = 30000 + major * 100 + minor;
+
+    } else if (v.length == 3 && v[0] == "3") {
+	n = v.map(Number).reduce(
+	    function(a, x) {
+		return 100 * a + x;
+	    });
+
+    };
+
+    if (n == 0) {
+	log("argos: Unsupported GNOME shell version " + str);
+	return 0;
+    }
+
+    // log("argos: GNOME shell version " + str + " => " + n);
+    return n;
+}
+
+const shellVersion = getShellVersion(Config.PACKAGE_VERSION);
 
 function readStream(stream, callback) {
   stream.read_line_async(GLib.PRIORITY_LOW, null, function(source, result) {

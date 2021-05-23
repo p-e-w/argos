@@ -40,7 +40,7 @@ var ArgosButton = new Lang.Class({
     this._updateTimeout = null;
     this._cycleTimeout = null;
 
-    this.connect("destroy", Lang.bind(this, this._onDestroy));
+    this.connect("destroy", Lang.bind(this, this._onButtonDestroy));
 
     this._updateRunning = false;
 
@@ -54,15 +54,13 @@ var ArgosButton = new Lang.Class({
     }
   },
 
-  _onDestroy: function() {
+  _onButtonDestroy: function() {
     this._isDestroyed = true;
 
     if (this._updateTimeout !== null)
       Mainloop.source_remove(this._updateTimeout);
     if (this._cycleTimeout !== null)
       Mainloop.source_remove(this._cycleTimeout);
-
-    this.menu.removeAll();
   },
 
   update: function() {

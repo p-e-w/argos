@@ -192,9 +192,9 @@ var ArgosButton = new Lang.Class({
         menuItem.label.visible = false;
         menus[dropdownLines[i + 1].menuLevel] = menuItem.menu;
       } else if ((i + 1) < dropdownLines.length &&
-		 dropdownLines[i + 1].menuLevel === dropdownLines[i].menuLevel &&
-		 dropdownLines[i + 1].hasOwnProperty("alternate") &&
-		 dropdownLines[i + 1].alternate === "true") {
+        dropdownLines[i + 1].menuLevel === dropdownLines[i].menuLevel &&
+        dropdownLines[i + 1].hasOwnProperty("alternate") &&
+        dropdownLines[i + 1].alternate === "true") {
         menuItem = new ArgosMenuItem(this, dropdownLines[i], dropdownLines[i + 1]);
         // Skip alternate line
         i++;

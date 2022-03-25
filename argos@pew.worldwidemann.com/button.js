@@ -10,6 +10,7 @@
  */
 
 const Lang = imports.lang;
+const GObject = imports.gi.GObject;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const PanelMenu = imports.ui.panelMenu;
@@ -21,12 +22,14 @@ const ArgosLineView = Extension.imports.lineview.ArgosLineView;
 const ArgosMenuItem = Extension.imports.menuitem.ArgosMenuItem;
 const Utilities = Extension.imports.utilities;
 
-var ArgosButton = new Lang.Class({
-  Name: "ArgosButton",
-  Extends: PanelMenu.Button,
+var ArgosButton = GObject.registerClass({
+  GTypeName: "ArgosButton",
+},
 
-  _init: function(file, settings) {
-    this.parent(0, "", false);
+class ArgosButton extends PanelMenu.Button {
+
+  _init(file, settings) {
+    super._init(0, "", false);
 
     this._file = file;
     this._updateInterval = settings.updateInterval;
@@ -52,9 +55,9 @@ var ArgosButton = new Lang.Class({
           this.update();
       }));
     }
-  },
+  }
 
-  _onDestroy: function() {
+  _onDestroy() {
     this._isDestroyed = true;
 
     if (this._updateTimeout !== null)
@@ -63,18 +66,18 @@ var ArgosButton = new Lang.Class({
       Mainloop.source_remove(this._cycleTimeout);
 
     this.menu.removeAll();
-  },
+  }
 
-  update: function() {
+  update() {
     if (this._updateTimeout !== null) {
       Mainloop.source_remove(this._updateTimeout);
       this._updateTimeout = null;
     }
 
     this._update();
-  },
+  }
 
-  _update: function() {
+  _update() {
     if (this._updateRunning)
       return;
 
@@ -106,9 +109,9 @@ var ArgosButton = new Lang.Class({
       log("Unable to execute file '" + this._file.get_basename() + "': " + error);
       this._updateRunning = false;
     }
-  },
+  }
 
-  _processOutput: function(output) {
+  _processOutput(output) {
     let buttonLines = [];
     let dropdownLines = [];
 

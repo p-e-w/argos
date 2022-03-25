@@ -9,27 +9,29 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
-const Lang = imports.lang;
+const GObject = imports.gi.GObject;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const GdkPixbuf = imports.gi.GdkPixbuf;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 
-var ArgosLineView = new Lang.Class({
-  Name: "ArgosLineView",
-  Extends: St.BoxLayout,
+var ArgosLineView = GObject.registerClass({
+  GTypeName: "ArgosLineView",
+},
 
-  _init: function(line) {
-    this.parent({
+class ArgosLineView extends St.BoxLayout {
+
+  _init(line) {
+    super._init({
       style_class: "argos-line-view"
     });
 
     if (typeof line !== "undefined")
       this.setLine(line);
-  },
+  }
 
-  setLine: function(line) {
+  setLine(line) {
     this.line = line;
 
     this.remove_all_children();
@@ -105,9 +107,9 @@ var ArgosLineView = new Lang.Class({
         }
       }
     }
-  },
+  }
 
-  setMarkup: function(markup) {
+  setMarkup(markup) {
     this.setLine({
       markup: markup
     });

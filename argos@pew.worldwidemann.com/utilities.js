@@ -282,15 +282,24 @@ function getShellVersion(str) {
   let versionParts = str.split(".");
   let versionNumber = 0;
 
-  if (versionParts.length === 2) {
+  if (versionParts.length < 2) {
+    log("Invalid GNOME Shell version '" + str + "'");
+    return 0;
+  }
+
+  let major = Number(versionParts[0]);
+
+  if (major >= 40) {
     // GNOME 40 and newer versioning scheme
     // https://discourse.gnome.org/t/new-gnome-versioning-scheme/4235
     // must be > 3.x.y with x <= 38
+    // For 40.x, the 3rd digit is ignored
     // 40.alpha -> 33997
     // 41.beta  -> 34098
     // 41.rc    -> 34099
     // 41.0     -> 34100
     // 40.1     -> 34001
+    // 40.1.1   -> 34001
     let testReleases = new Map([["alpha", -3], ["beta", -2], ["rc", -1]]);
     let minor = testReleases.get(versionParts[1]);
     let major = Number(versionParts[0]);

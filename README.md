@@ -255,7 +255,7 @@ Plugin executables are run with the following special environment variables set:
 | Name | Value |
 | --- | --- |
 | `ARGOS_VERSION` | Version number of the Argos extension. The presence of this environment variable can also be used to determine that the plugin is actually running in Argos, rather than BitBar or [kargos](https://github.com/lipido/kargos). |
-| `ARGOS_MENU_OPEN` | `true` if the dropdown menu was open at the time the plugin was run, and `false` otherwise. |
+| `ARGOS_MENU_OPEN` | `true` if the dropdown menu was open at the time the plugin was run, and `false` otherwise. Requires `+` in file name to work. |
 
 
 ## BitBar plugins with Argos

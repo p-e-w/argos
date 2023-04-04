@@ -41,7 +41,7 @@ class ArgosButton extends PanelMenu.Button {
     this._isDestroyed = false;
 
     this._updateTimeout = null;
-    this._cycleTimeout = null;
+    this._cycleTimeouts = [];
 
     this.connect("destroy", Lang.bind(this, this._onDestroy));
 
@@ -62,9 +62,8 @@ class ArgosButton extends PanelMenu.Button {
 
     if (this._updateTimeout !== null)
       Mainloop.source_remove(this._updateTimeout);
-    if (this._cycleTimeout !== null)
-      Mainloop.source_remove(this._cycleTimeout);
 
+    this._cycleTimeouts.forEach(cycle => Mainloop.source_remove(cycle));
     this.menu.removeAll();
   }
 
@@ -134,10 +133,8 @@ class ArgosButton extends PanelMenu.Button {
 
     this.menu.removeAll();
 
-    if (this._cycleTimeout !== null) {
-      Mainloop.source_remove(this._cycleTimeout);
-      this._cycleTimeout = null;
-    }
+    this._cycleTimeouts.forEach(cycle => Mainloop.source_remove(cycle));
+    this._cycleTimeouts = [];
 
     Utilities.getActor(this).visible = buttonLines.length > 0 || !dropdownMode;
 
@@ -149,15 +146,18 @@ class ArgosButton extends PanelMenu.Button {
     } else if (buttonLines.length === 1) {
       this._lineView.setLine(buttonLines[0]);
     } else {
-      this._lineView.setLine(buttonLines[0]);
-      let i = 0;
-      this._cycleTimeout = Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
-        i++;
-        this._lineView.setLine(buttonLines[i % buttonLines.length]);
-        return true;
-      }));
-
+      let fullsec = 0;
       for (let j = 0; j < buttonLines.length; j++) {
+        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, fullsec, Lang.bind(this, function() {
+          this._cycleTimeouts.push(Mainloop.timeout_add_seconds(fullsec, Lang.bind(this, function() {
+            this._lineView.setLine(buttonLines[j]);
+            return true;
+          })));
+          this._lineView.setLine(buttonLines[j]);
+          return false;
+        }));
+        fullsec += +buttonLines[j].timeout || 3;
+        
         if (buttonLines[j].dropdown !== "false")
           this.menu.addMenuItem(new ArgosMenuItem(this, buttonLines[j]));
       }

@@ -33,6 +33,7 @@ class ArgosButton extends PanelMenu.Button {
 
     this._file = file;
     this._updateInterval = settings.updateInterval;
+    this._updateOnClose = settings.updateOnClose;
 
     this._lineView = new ArgosLineView();
     this._lineView.setMarkup("<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>");
@@ -97,7 +98,7 @@ class ArgosButton extends PanelMenu.Button {
 
           this._processOutput(standardOutput.split("\n"));
 
-          if (this._updateInterval !== null) {
+          if (this._updateInterval !== null && (this.menu.isOpen || (!this.menu.isOpen && this._updateOnClose))) {
             this._updateTimeout = Mainloop.timeout_add_seconds(this._updateInterval, Lang.bind(this, function() {
               this._updateTimeout = null;
               this._update();

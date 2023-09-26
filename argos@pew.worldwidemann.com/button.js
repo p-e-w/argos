@@ -43,17 +43,17 @@ class ArgosButton extends PanelMenu.Button {
     this._updateTimeout = null;
     this._cycleTimeout = null;
 
-    this.connect("destroy", Lang.bind(this, this._onDestroy));
+    this.connect("destroy", this._onDestroy.bind(this));
 
     this._updateRunning = false;
 
     this._update();
 
     if (settings.updateOnOpen) {
-      this.menu.connect("open-state-changed", Lang.bind(this, function(menu, open) {
-        if (open)
-          this.update();
-      }));
+      this.menu.connect("open-state-changed", (open) => {
+	if (open)
+	  this.update();
+      });
     }
   }
 

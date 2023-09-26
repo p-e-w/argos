@@ -14,7 +14,6 @@ import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
-const Mainloop = imports.mainloop;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const ArgosLineView = Extension.imports.lineview.ArgosLineView;
@@ -60,16 +59,16 @@ class ArgosButton extends PanelMenu.Button {
     this._isDestroyed = true;
 
     if (this._updateTimeout !== null)
-      Mainloop.source_remove(this._updateTimeout);
+      GLib.source_remove(this._updateTimeout);
     if (this._cycleTimeout !== null)
-      Mainloop.source_remove(this._cycleTimeout);
+      GLib.source_remove(this._cycleTimeout);
 
     this.menu.removeAll();
   }
 
   update() {
     if (this._updateTimeout !== null) {
-      Mainloop.source_remove(this._updateTimeout);
+      GLib.source_remove(this._updateTimeout);
       this._updateTimeout = null;
     }
 
@@ -97,11 +96,14 @@ class ArgosButton extends PanelMenu.Button {
           this._processOutput(standardOutput.split("\n"));
 
           if (this._updateInterval !== null) {
-            this._updateTimeout = Mainloop.timeout_add_seconds(this._updateInterval, () => {
-              this._updateTimeout = null;
-              this._update();
-              return false;
-            });
+            this._updateTimeout =
+	      GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+				       this._updateInterval,
+				       () => {
+					 this._updateTimeout = null;
+					 this._update();
+					 return false;
+				       });
           }
         });
     } catch (error) {
@@ -134,7 +136,7 @@ class ArgosButton extends PanelMenu.Button {
     this.menu.removeAll();
 
     if (this._cycleTimeout !== null) {
-      Mainloop.source_remove(this._cycleTimeout);
+      GLib.source_remove(this._cycleTimeout);
       this._cycleTimeout = null;
     }
 
@@ -150,7 +152,7 @@ class ArgosButton extends PanelMenu.Button {
     } else {
       this._lineView.setLine(buttonLines[0]);
       let i = 0;
-      this._cycleTimeout = Mainloop.timeout_add_seconds(3, () => {
+      this._cycleTimeout = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 3, () => {
         i++;
         this._lineView.setLine(buttonLines[i % buttonLines.length]);
         return true;

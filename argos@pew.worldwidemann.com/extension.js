@@ -66,7 +66,7 @@ function enable() {
     // Some high-level file operations trigger multiple "changed" events in rapid succession.
     // Debouncing groups them together to avoid unnecessary updates.
     if (debounceTimeout === null) {
-      debounceTimeout = Mainloop.timeout_add(100, function() {
+      debounceTimeout = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, function() {
         debounceTimeout = null;
         addButtons();
         return false;
@@ -79,7 +79,7 @@ function disable() {
   directoryMonitor.disconnect(directoryChangedId);
 
   if (debounceTimeout !== null)
-    Mainloop.source_remove(debounceTimeout);
+    GLib.source_remove(debounceTimeout);
 
   removeButtons();
 }

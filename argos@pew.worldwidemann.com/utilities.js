@@ -9,11 +9,11 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
-const GObject = imports.gi.GObject;
-const St = imports.gi.St;
-const GLib = imports.gi.GLib;
-const Clutter = imports.gi.Clutter;
-const Gio = imports.gi.Gio;
+import GObject from 'gi://GObject';
+import St from 'gi://St';
+import GLib from 'gi://GLib';
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 const Config = imports.misc.config;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();

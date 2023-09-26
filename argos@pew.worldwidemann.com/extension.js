@@ -9,8 +9,8 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
-const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
 

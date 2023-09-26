@@ -9,7 +9,6 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
-const Lang = imports.lang;
 const GObject = imports.gi.GObject;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
@@ -89,7 +88,7 @@ class ArgosButton extends PanelMenu.Button {
 
     try {
       Utilities.spawnWithCallback(null, [this._file.get_path()], envp, 0, null,
-        Lang.bind(this, function(standardOutput) {
+        (standardOutput) => {
           this._updateRunning = false;
 
           if (this._isDestroyed)
@@ -98,13 +97,13 @@ class ArgosButton extends PanelMenu.Button {
           this._processOutput(standardOutput.split("\n"));
 
           if (this._updateInterval !== null) {
-            this._updateTimeout = Mainloop.timeout_add_seconds(this._updateInterval, Lang.bind(this, function() {
+            this._updateTimeout = Mainloop.timeout_add_seconds(this._updateInterval, () => {
               this._updateTimeout = null;
               this._update();
               return false;
-            }));
+            });
           }
-        }));
+        });
     } catch (error) {
       log("Unable to execute file '" + this._file.get_basename() + "': " + error);
       this._updateRunning = false;
@@ -151,11 +150,11 @@ class ArgosButton extends PanelMenu.Button {
     } else {
       this._lineView.setLine(buttonLines[0]);
       let i = 0;
-      this._cycleTimeout = Mainloop.timeout_add_seconds(3, Lang.bind(this, function() {
+      this._cycleTimeout = Mainloop.timeout_add_seconds(3, () => {
         i++;
         this._lineView.setLine(buttonLines[i % buttonLines.length]);
         return true;
-      }));
+      });
 
       for (let j = 0; j < buttonLines.length; j++) {
         if (buttonLines[j].dropdown !== "false")
@@ -214,9 +213,9 @@ class ArgosButton extends PanelMenu.Button {
     let menuItem = new PopupMenu.PopupMenuItem(this._file.get_basename(), {
       style_class: "argos-menu-item-edit"
     });
-    menuItem.connect("activate", Lang.bind(this, function() {
+    menuItem.connect("activate", () => {
       Gio.AppInfo.launch_default_for_uri("file://" + this._file.get_path(), null);
-    }));
+    });
     this.menu.addMenuItem(menuItem);
   }
 });

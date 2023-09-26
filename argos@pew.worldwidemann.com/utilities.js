@@ -9,7 +9,6 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
-const Lang = imports.lang;
 const GObject = imports.gi.GObject;
 const St = imports.gi.St;
 const GLib = imports.gi.GLib;
@@ -354,16 +353,7 @@ function getActor(obj) {
 }
 
 function makeSimpleClass(BaseClass, getSuperArgs, initFn, name) {
-  if (SHELL_VERSION < SHELL_3_32) {
-    return new Lang.Class({
-      Name: name,
-      Extends: BaseClass,
-      _init: function(...args) {
-        this.parent(getSuperArgs(...args));
-        initFn.bind(this)(...args);
-      }
-    });
-  } else if (SHELL_VERSION < SHELL_3_34) {
+  if (SHELL_VERSION < SHELL_3_34) {
     return class extends BaseClass {
       constructor(...args) {
         super(getSuperArgs(...args));

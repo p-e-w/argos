@@ -9,7 +9,6 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
-const Lang = imports.lang;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const PopupMenu = imports.ui.popupMenu;
@@ -41,7 +40,7 @@ const _ArgosMenuItem_init = function(button, line, alternateLine) {
   }
 
   if (hasAction) {
-    this.connect("activate", Lang.bind(this, function() {
+    this.connect("activate", () => {
       let activeLine = (altSwitcher === null) ? line : altSwitcher.actor.get_child().line;
 
       if (activeLine.hasOwnProperty("href"))
@@ -73,7 +72,7 @@ const _ArgosMenuItem_init = function(button, line, alternateLine) {
       } else if (activeLine.refresh === "true") {
         button.update();
       }
-    }));
+    });
   }
 }
 

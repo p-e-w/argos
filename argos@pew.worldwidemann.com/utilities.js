@@ -14,10 +14,8 @@ import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-const Config = imports.misc.config;
-
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const EMOJI = Extension.imports.emoji.EMOJI;
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
+import EMOJI from './emoji.js'
 
 const BOXES = {
   l: "left",

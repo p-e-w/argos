@@ -11,8 +11,7 @@
 
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
-const Main = imports.ui.main;
-const Mainloop = imports.mainloop;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const ArgosButton = Extension.imports.button.ArgosButton;

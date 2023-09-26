@@ -17,7 +17,6 @@ const GObject = imports.gi.GObject;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const ArgosLineView = Extension.imports.lineview.ArgosLineView;
 const Utilities = Extension.imports.utilities;
-const AltSwitcher = Utilities.AltSwitcher;
 
 const ArgosMenuItem = GObject.registerClass(
   {

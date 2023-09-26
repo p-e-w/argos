@@ -41,11 +41,7 @@ constructor() {
       'echo "$URL | iconName=help-faq-symbolic href=\'https://$URL\'"\n' +
       'echo "$DIR | iconName=folder-symbolic href=\'file://$DIR\'"\n\n';
 
-    GLib.file_set_contents(scriptPath, scriptContents);
-
-    // Running an external program just to make a file executable is ugly,
-    // but Gjs appears to be missing bindings for the "chmod" syscall
-    GLib.spawn_sync(null, ["chmod", "+x", scriptPath], null, GLib.SpawnFlags.SEARCH_PATH, null);
+    GLib.file_set_contents_full(scriptPath, scriptContents, GLib.FileSetContentsFlags.CONSISTENT, 0o700);
   }
 
   // WATCH_MOVES requires GLib 2.46 or later

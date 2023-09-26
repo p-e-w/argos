@@ -16,19 +16,17 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import ArgosButton from './button.js'
 import * as Utilities from './utilities.js'
 
-let directory;
-let directoryMonitor;
-let directoryChangedId;
-let debounceTimeout = null;
-let buttons = [];
+export default class ArgosExtension {
 
-function init() {
+constructor() {
   let directoryPath = GLib.build_filenamev([GLib.get_user_config_dir(), "argos"]);
 
-  directory = Gio.File.new_for_path(directoryPath);
+  this.directory = Gio.File.new_for_path(directoryPath);
+  this.buttons = [];
+  this.debounceTimeout = null;
 
-  if (!directory.query_exists(null)) {
-    directory.make_directory(null);
+  if (!this.directory.query_exists(null)) {
+    this.directory.make_directory(null);
 
     // Create "welcome" script on first run to indicate
     // that the extension is installed and working
@@ -53,40 +51,40 @@ function init() {
   // WATCH_MOVES requires GLib 2.46 or later
   let monitorFlags = Gio.FileMonitorFlags.hasOwnProperty("WATCH_MOVES") ?
     Gio.FileMonitorFlags.WATCH_MOVES : Gio.FileMonitorFlags.SEND_MOVED;
-  directoryMonitor = directory.monitor_directory(monitorFlags, null);
+  this.directoryMonitor = this.directory.monitor_directory(monitorFlags, null);
 }
 
-function enable() {
-  addButtons();
+enable() {
+  this.addButtons();
 
-  directoryChangedId = directoryMonitor.connect("changed", function(monitor, file, otherFile, eventType) {
-    removeButtons();
+  this.directoryChangedId = this.directoryMonitor.connect("changed", (monitor, file, otherFile, eventType) => {
+    this.removeButtons();
 
     // Some high-level file operations trigger multiple "changed" events in rapid succession.
     // Debouncing groups them together to avoid unnecessary updates.
-    if (debounceTimeout === null) {
-      debounceTimeout = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, function() {
-        debounceTimeout = null;
-        addButtons();
+    if (this.debounceTimeout === null) {
+      this.debounceTimeout = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+        this.debounceTimeout = null;
+        this.addButtons();
         return false;
       });
     }
   });
 }
 
-function disable() {
-  directoryMonitor.disconnect(directoryChangedId);
+disable() {
+  this.directoryMonitor.disconnect(this.directoryChangedId);
 
-  if (debounceTimeout !== null)
-    GLib.source_remove(debounceTimeout);
+  if (this.debounceTimeout !== null)
+    GLib.source_remove(this.debounceTimeout);
 
-  removeButtons();
+  this.removeButtons();
 }
 
-function addButtons() {
+addButtons() {
   let files = [];
 
-  let enumerator = directory.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NONE, null);
+  let enumerator = this.directory.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NONE, null);
 
   let fileInfo = null;
   while ((fileInfo = enumerator.next_file(null)) !== null) {
@@ -107,14 +105,15 @@ function addButtons() {
   for (let i = files.length - 1; i >= 0; i--) {
     let settings = Utilities.parseFilename(files[i].get_basename());
     let button = new ArgosButton(files[i], settings);
-    buttons.push(button);
+    this.buttons.push(button);
     Main.panel.addToStatusArea("argos-button-" + i, button, settings.position, settings.box);
   }
 }
 
-function removeButtons() {
-  for (let i = 0; i < buttons.length; i++) {
-    buttons[i].destroy();
+removeButtons() {
+  for (let i = 0; i < this.buttons.length; i++) {
+    this.buttons[i].destroy();
   }
-  buttons = [];
+  this.buttons = [];
+}
 }

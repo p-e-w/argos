@@ -14,11 +14,10 @@ import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const ArgosLineView = Extension.imports.lineview.ArgosLineView;
-const Utilities = Extension.imports.utilities;
+import ArgosLineView from './lineview.js'
+import * as Utilities from './utilities.js'
 
-const ArgosMenuItem = GObject.registerClass(
+const cArgosMenuItem = GObject.registerClass(
   {
     GTypeName: "ArgosMenuItem"
   },
@@ -84,3 +83,5 @@ const ArgosMenuItem = GObject.registerClass(
       }
     }
   });
+
+export default cArgosMenuItem;

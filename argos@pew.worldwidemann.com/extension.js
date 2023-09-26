@@ -13,9 +13,8 @@ import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const ArgosButton = Extension.imports.button.ArgosButton;
-const Utilities = Extension.imports.utilities;
+import ArgosButton from './button.js'
+import * as Utilities from './utilities.js'
 
 let directory;
 let directoryMonitor;

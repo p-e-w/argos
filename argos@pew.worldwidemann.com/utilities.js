@@ -17,13 +17,13 @@ import Gio from 'gi://Gio';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import EMOJI from './emoji.js'
 
-const BOXES = {
+export const BOXES = {
   l: "left",
   c: "center",
   r: "right"
 };
 
-function parseFilename(filename) {
+export function parseFilename(filename) {
   let settings = {
     updateOnOpen: false,
     updateInterval: null,
@@ -71,7 +71,7 @@ function parseFilename(filename) {
 
 // Performs (mostly) BitBar-compatible output line parsing
 // (see https://github.com/matryer/bitbar#plugin-api)
-function parseLine(lineString) {
+export function parseLine(lineString) {
   let line = {};
 
   let separatorIndex = lineString.indexOf("|");
@@ -175,9 +175,9 @@ function parseLine(lineString) {
   return line;
 }
 
-const ANSI_COLORS = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"];
+export const ANSI_COLORS = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"];
 
-function ansiToMarkup(text) {
+export function ansiToMarkup(text) {
   let markup = "";
 
   let markupAttributes = {};
@@ -247,7 +247,7 @@ function ansiToMarkup(text) {
 // Combines the benefits of spawn_sync (easy retrieval of output)
 // with those of spawn_async (non-blocking execution).
 // Based on https://github.com/optimisme/gjs-examples/blob/master/assets/spawn.js.
-function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, callback) {
+export function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, callback) {
   let [success, pid, stdinFile, stdoutFile, stderrFile] = GLib.spawn_async_with_pipes(
     workingDirectory, argv, envp, flags, childSetup);
 
@@ -275,7 +275,7 @@ function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, call
   });
 }
 
-function getShellVersion(str) {
+export function getShellVersion(str) {
   let versionParts = str.split(".");
   let versionNumber = 0;
 
@@ -321,11 +321,11 @@ function getShellVersion(str) {
   return versionNumber;
 }
 
-const SHELL_VERSION = getShellVersion(Config.PACKAGE_VERSION);
+export const SHELL_VERSION = getShellVersion(Config.PACKAGE_VERSION);
 const SHELL_3_32 = getShellVersion("3.32.0");
 const SHELL_3_34 = getShellVersion("3.34.0");
 
-function readStream(stream, callback) {
+export function readStream(stream, callback) {
   stream.read_line_async(GLib.PRIORITY_LOW, null, function(source, result) {
     let [line] = source.read_line_finish(result);
 
@@ -338,6 +338,6 @@ function readStream(stream, callback) {
   });
 }
 
-function getActor(obj) {
+export function getActor(obj) {
   return obj;
 }

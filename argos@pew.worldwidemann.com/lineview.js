@@ -16,7 +16,7 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 
-var ArgosLineView = GObject.registerClass({
+const cArgosLineView = GObject.registerClass({
   GTypeName: "ArgosLineView",
 },
 
@@ -115,3 +115,5 @@ class ArgosLineView extends St.BoxLayout {
     });
   }
 });
+
+export default cArgosLineView;

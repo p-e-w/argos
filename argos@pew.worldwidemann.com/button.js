@@ -15,12 +15,11 @@ import Gio from 'gi://Gio';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const ArgosLineView = Extension.imports.lineview.ArgosLineView;
-const ArgosMenuItem = Extension.imports.menuitem.ArgosMenuItem;
-const Utilities = Extension.imports.utilities;
+import ArgosLineView from './lineview.js';
+import ArgosMenuItem from './menuitem.js';
+import * as Utilities from './utilities.js';
 
-var ArgosButton = GObject.registerClass({
+const cArgosButton = GObject.registerClass({
   GTypeName: "ArgosButton",
 },
 
@@ -221,3 +220,5 @@ class ArgosButton extends PanelMenu.Button {
     this.menu.addMenuItem(menuItem);
   }
 });
+
+export default cArgosButton;

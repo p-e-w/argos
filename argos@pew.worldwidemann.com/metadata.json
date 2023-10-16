@@ -4,13 +4,6 @@
   "description": "Create GNOME Shell extensions in seconds",
   "url": "https://github.com/p-e-w/argos",
   "shell-version": [
-    "3.34",
-    "3.36",
-    "3.38",
-    "40",
-    "41",
-    "42",
-    "43",
-    "44"
+    "45"
   ]
 }

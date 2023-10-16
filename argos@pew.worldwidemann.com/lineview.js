@@ -9,14 +9,14 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
-const GObject = imports.gi.GObject;
-const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
-const GdkPixbuf = imports.gi.GdkPixbuf;
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
+import GObject from 'gi://GObject';
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
+import GdkPixbuf from 'gi://GdkPixbuf';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
 
-var ArgosLineView = GObject.registerClass({
+const cArgosLineView = GObject.registerClass({
   GTypeName: "ArgosLineView",
 },
 
@@ -115,3 +115,5 @@ class ArgosLineView extends St.BoxLayout {
     });
   }
 });
+
+export default cArgosLineView;

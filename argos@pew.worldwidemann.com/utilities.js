@@ -9,24 +9,21 @@
  * (https://gnu.org/licenses/gpl.html)
  */
 
-const Lang = imports.lang;
-const GObject = imports.gi.GObject;
-const St = imports.gi.St;
-const GLib = imports.gi.GLib;
-const Clutter = imports.gi.Clutter;
-const Gio = imports.gi.Gio;
-const Config = imports.misc.config;
+import GObject from 'gi://GObject';
+import St from 'gi://St';
+import GLib from 'gi://GLib';
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
+import EMOJI from './emoji.js'
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const EMOJI = Extension.imports.emoji.EMOJI;
-
-const BOXES = {
+export const BOXES = {
   l: "left",
   c: "center",
   r: "right"
 };
 
-function parseFilename(filename) {
+export function parseFilename(filename) {
   let settings = {
     updateOnOpen: false,
     updateInterval: null,
@@ -74,7 +71,7 @@ function parseFilename(filename) {
 
 // Performs (mostly) BitBar-compatible output line parsing
 // (see https://github.com/matryer/bitbar#plugin-api)
-function parseLine(lineString) {
+export function parseLine(lineString) {
   let line = {};
 
   let separatorIndex = lineString.indexOf("|");
@@ -178,9 +175,9 @@ function parseLine(lineString) {
   return line;
 }
 
-const ANSI_COLORS = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"];
+export const ANSI_COLORS = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"];
 
-function ansiToMarkup(text) {
+export function ansiToMarkup(text) {
   let markup = "";
 
   let markupAttributes = {};
@@ -250,7 +247,7 @@ function ansiToMarkup(text) {
 // Combines the benefits of spawn_sync (easy retrieval of output)
 // with those of spawn_async (non-blocking execution).
 // Based on https://github.com/optimisme/gjs-examples/blob/master/assets/spawn.js.
-function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, callback) {
+export function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, callback) {
   let [success, pid, stdinFile, stdoutFile, stderrFile] = GLib.spawn_async_with_pipes(
     workingDirectory, argv, envp, flags, childSetup);
 
@@ -278,7 +275,7 @@ function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, call
   });
 }
 
-function getShellVersion(str) {
+export function getShellVersion(str) {
   let versionParts = str.split(".");
   let versionNumber = 0;
 
@@ -324,174 +321,23 @@ function getShellVersion(str) {
   return versionNumber;
 }
 
-const SHELL_VERSION = getShellVersion(Config.PACKAGE_VERSION);
+export const SHELL_VERSION = getShellVersion(Config.PACKAGE_VERSION);
 const SHELL_3_32 = getShellVersion("3.32.0");
 const SHELL_3_34 = getShellVersion("3.34.0");
 
-function readStream(stream, callback) {
+export function readStream(stream, callback) {
   stream.read_line_async(GLib.PRIORITY_LOW, null, function(source, result) {
     let [line] = source.read_line_finish(result);
 
     if (line === null) {
       callback(null);
     } else {
-      if (SHELL_VERSION <= SHELL_3_34) {
-        callback(String(line) + "\n");
-      } else {
-        callback(imports.byteArray.toString(line) + "\n");
-      }
+      callback(imports.byteArray.toString(line) + "\n");
       readStream(source, callback);
     }
   });
 }
 
-function getActor(obj) {
-  if (SHELL_VERSION >= SHELL_3_34) {
-    return obj;
-  } else {
-    return obj.actor;
-  }
-}
-
-function makeSimpleClass(BaseClass, getSuperArgs, initFn, name) {
-  if (SHELL_VERSION < SHELL_3_32) {
-    return new Lang.Class({
-      Name: name,
-      Extends: BaseClass,
-      _init: function(...args) {
-        this.parent(getSuperArgs(...args));
-        initFn.bind(this)(...args);
-      }
-    });
-  } else if (SHELL_VERSION < SHELL_3_34) {
-    return class extends BaseClass {
-      constructor(...args) {
-        super(getSuperArgs(...args));
-        initFn.bind(this)(...args);
-      }
-    }
-  } else {
-    return GObject.registerClass(
-      {
-        GTypeName: name
-      },
-      class extends BaseClass {
-        _init(...args) {
-          super._init(getSuperArgs(...args));
-          initFn.bind(this)(...args);
-        }
-      }
-    );
-  }
-}
-
-if (SHELL_VERSION <= SHELL_3_34) {
-  var AltSwitcher = imports.ui.status.system.AltSwitcher;
-} else {
-  // Copied from ui.status.system.AltSwitcher, removed in
-  // https://gitlab.gnome.org/GNOME/gnome-shell/-/commit/147a743d8d7947d99e274861a34403aaa204324e
-  var AltSwitcher = GObject.registerClass(
-    class AltSwitcher extends St.Bin {
-      _init(standard, alternate) {
-        super._init();
-        this._standard = standard;
-        this._standard.connect("notify::visible", this._sync.bind(this));
-        if (this._standard instanceof St.Button)
-          this._standard.connect("clicked", () => this._clickAction.release());
-
-        this._alternate = alternate;
-        this._alternate.connect("notify::visible", this._sync.bind(this));
-        if (this._alternate instanceof St.Button)
-          this._alternate.connect("clicked", () => this._clickAction.release());
-
-        this._capturedEventId = global.stage.connect("captured-event", this._onCapturedEvent.bind(this));
-
-        this._flipped = false;
-
-        this._clickAction = new Clutter.ClickAction();
-        this._clickAction.connect("long-press", this._onLongPress.bind(this));
-
-        this.connect("destroy", this._onDestroy.bind(this));
-      }
-
-      vfunc_map() {
-        super.vfunc_map();
-        this._flipped = false;
-      }
-
-      vfunc_unmap() {
-        super.vfunc_unmap();
-        this._flipped = false;
-      }
-
-      _sync() {
-        let childToShow = null;
-
-        if (this._standard.visible && this._alternate.visible) {
-          let [x_, y_, mods] = global.get_pointer();
-          let altPressed = (mods & Clutter.ModifierType.MOD1_MASK) !== 0;
-          if (this._flipped) {
-            childToShow = altPressed ? this._standard : this._alternate;
-          } else {
-            childToShow = altPressed ? this._alternate : this._standard;
-          }
-        } else if (this._standard.visible) {
-          childToShow = this._standard;
-        } else if (this._alternate.visible) {
-          childToShow = this._alternate;
-        } else {
-          this.hide();
-          return;
-        }
-
-        let childShown = this.get_child();
-        if (childShown !== childToShow) {
-          if (childShown) {
-            if (childShown.fake_release)
-              childShown.fake_release();
-            childShown.remove_action(this._clickAction);
-          }
-          childToShow.add_action(this._clickAction);
-
-          let hasFocus = this.contains(global.stage.get_key_focus());
-          this.set_child(childToShow);
-          if (hasFocus)
-            childToShow.grab_key_focus();
-
-          // The actors might respond to hover, so
-          // sync the pointer to make sure they update.
-          global.sync_pointer();
-        }
-
-        this.show();
-      }
-
-      _onDestroy() {
-        if (this._capturedEventId > 0) {
-          global.stage.disconnect(this._capturedEventId);
-          this._capturedEventId = 0;
-        }
-      }
-
-      _onCapturedEvent(actor, event) {
-        let type = event.type();
-        if (type === Clutter.EventType.KEY_PRESS || type === Clutter.EventType.KEY_RELEASE) {
-          let key = event.get_key_symbol();
-          if (key === Clutter.KEY_Alt_L || key === Clutter.KEY_Alt_R)
-            this._sync();
-        }
-
-        return Clutter.EVENT_PROPAGATE;
-      }
-
-      _onLongPress(action, actor, state) {
-        if (state === Clutter.LongPressState.QUERY || state === Clutter.LongPressState.CANCEL)
-          return true;
-
-        this._flipped = !this._flipped;
-        this._sync();
-        return true;
-      }
-    }
-  );
+export function getActor(obj) {
+  return obj;
 }

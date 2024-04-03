@@ -22,9 +22,9 @@ More precisely, Argos is a GNOME Shell extension that turns executables' standar
 
 ## Installation
 
-### From the GNOME Shell Extensions website (recommended)
+[<img height="100" src="https://github.com/andyholmes/gnome-shell-extensions-badge/blob/master/get-it-on-ego.svg">](https://extensions.gnome.org/extension/1176/argos/)
 
-[<img src="https://img.shields.io/badge/extensions.gnome.org-Argos-9999ff.svg" height="30">](https://extensions.gnome.org/extension/1176/argos/)
+### From the GNOME Shell Extensions website (recommended)
 
 If you have a recent version of GNOME Software, you can also install Argos directly from there by simply searching for it. Note that this method may not always get you the latest release of Argos.
 

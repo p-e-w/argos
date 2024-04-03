@@ -33,7 +33,7 @@ class ArgosButton extends PanelMenu.Button {
 
     this._lineView = new ArgosLineView();
     this._lineView.setMarkup("<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>");
-    Utilities.getActor(this).add_actor(this._lineView);
+    Utilities.getActor(this).add_child(this._lineView);
 
     this._isDestroyed = false;
 

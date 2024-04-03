@@ -22,16 +22,35 @@ More precisely, Argos is a GNOME Shell extension that turns executables' standar
 
 ## Installation
 
-### From the GNOME Shell Extensions website (recommended)
+### Manually using git (all recent GNOME shell versions)
+
+Clone the repository:
+
+     git clone https://github.com/p-e-w/argos
+
+Check out the code matching your GNOME shell version:
+
+- GNOME 45 and newer: nothing to be done (just use the master branch)
+- GNOME 42 - 44: Use tag `GNOME-44`,
+- GNOME 3.26 - 41: Use tag `GNOME-41`.
+
+Thus e.g. for GNOME shell 44, run:
+
+    git switch -c gnome-44 GNOME-44
+
+Then copy or symlink the directory
+`argos@pew.worldwidemann.com` into
+`~/.local/share/gnome-shell/extensions`. Restart GNOME Shell by pressing
+<kbd>Alt+F2</kbd>, then entering `r` (GNOME/X11) or by logging out and logging
+in again (Wayland). On some systems, you may additionally
+have to enable the Argos extension using the GNOME "extensions" application or GNOME Tweak Tool.
+
+### From the GNOME Shell Extensions website (GNOME 3.32 and earlier)
 
 [<img src="https://img.shields.io/badge/extensions.gnome.org-Argos-9999ff.svg" height="30">](https://extensions.gnome.org/extension/1176/argos/)
 
-If you have a recent version of GNOME Software, you can also install Argos directly from there by simply searching for it. Note that this method may not always get you the latest release of Argos.
-
-### Manually
-
-Clone the repository, then copy or symlink the directory `argos@pew.worldwidemann.com` into `~/.local/share/gnome-shell/extensions`. Restart GNOME Shell by pressing <kbd>Alt+F2</kbd>, then entering `r`. On some systems, you may additionally have to enable the Argos extension using GNOME Tweak Tool.
-
+**Important:** Argos for GNOME shell 3.34 and later (including GNOME 40 and
+beyond) are **not** available on extensions.gnome.org. Read about the reasons [here](https://github.com/p-e-w/argos/issues/108#issuecomment-585076628).
 
 ## Examples
 

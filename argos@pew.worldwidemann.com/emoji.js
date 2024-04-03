@@ -1286,3 +1286,5 @@ var EMOJI = {
   "zm": "🇿🇲",
   "zw": "🇿🇼"
 };
+
+export default EMOJI;

@@ -92,8 +92,8 @@ class ArgosLineView extends St.BoxLayout {
       this.add_child(label);
 
       let clutterText = label.get_clutter_text();
-      clutterText.use_markup = true;
       clutterText.text = line.markup;
+      clutterText.use_markup = true;
 
       if (line.hasOwnProperty("length")) {
         let maxLength = parseInt(line.length, 10);

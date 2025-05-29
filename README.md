@@ -22,6 +22,11 @@ More precisely, Argos is a GNOME Shell extension that turns executables' standar
 
 ## Installation
 
+### Dependencies
+
+For GNOME 45 and newer, you need `xdg-terminal-exec` since on newer GNOME
+releases we cannot assume `gnome-terminal` is preinstalled.
+
 ### Manually using git (all recent GNOME shell versions)
 
 Clone the repository:

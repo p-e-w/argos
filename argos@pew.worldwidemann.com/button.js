@@ -30,6 +30,7 @@ class ArgosButton extends PanelMenu.Button {
 
     this._file = file;
     this._updateInterval = settings.updateInterval;
+    this._pauseWhileOpen = !!settings.pauseWhileOpen;
 
     this._lineView = new ArgosLineView();
     this._lineView.setMarkup("<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>");
@@ -50,6 +51,30 @@ class ArgosButton extends PanelMenu.Button {
       this.menu.connect("open-state-changed", (open) => {
 	if (open)
 	  this.update();
+      });
+    }
+    if (this._pauseWhileOpen) {
+      this.menu.connect('open-state-changed', (_, open) => {
+        if (open) {
+          // menu opened → cancel pending timer
+          if (this._updateTimeout) {
+            GLib.source_remove(this._updateTimeout);
+            this._updateTimeout = 0;
+          }
+        } else {
+          // menu closed → resume scheduling if interval set
+          if (this._updateInterval != null && !this._updateTimeout) {
+            this._updateTimeout = GLib.timeout_add_seconds(
+              GLib.PRIORITY_DEFAULT,
+              this._updateInterval,
+              () => {
+                this._updateTimeout = null;
+                this._update();
+                return false;
+              }
+            );
+          }
+        }
       });
     }
   }
@@ -94,15 +119,16 @@ class ArgosButton extends PanelMenu.Button {
 
           this._processOutput(standardOutput.split("\n"));
 
-          if (this._updateInterval !== null) {
-            this._updateTimeout =
-	      GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
-				       this._updateInterval,
-				       () => {
-					 this._updateTimeout = null;
-					 this._update();
-					 return false;
-				       });
+          if (this._updateInterval !== null && (!this._pauseWhileOpen || !this.menu.isOpen)) {
+            this._updateTimeout = GLib.timeout_add_seconds(
+              GLib.PRIORITY_DEFAULT,
+              this._updateInterval,
+              () => {
+                this._updateTimeout = null;
+                this._update();
+                return false;
+              }
+            );
           }
         });
     } catch (error) {

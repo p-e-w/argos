@@ -73,8 +73,18 @@ export function parseFilename(filename) {
 // (see https://github.com/matryer/bitbar#plugin-api)
 export function parseLine(lineString) {
   let line = {};
+  let separatorIndex = undefined;
 
-  let separatorIndex = lineString.indexOf("|");
+  do
+  {
+    separatorIndex = lineString.indexOf("|", separatorIndex);
+    if (separatorIndex === 0 || lineString[separatorIndex-1] != '\\') {
+      // found a non-escaped pipe symbol
+      break;
+    }
+    // keep looking
+    ++separatorIndex;
+  } while(separatorIndex < lineString.length);
 
   if (separatorIndex >= 0) {
     let attributes = [];

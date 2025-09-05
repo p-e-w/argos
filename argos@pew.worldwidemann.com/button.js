@@ -74,6 +74,14 @@ class ArgosButton extends PanelMenu.Button {
     this._update();
   }
 
+  getFileBasename() {
+    return this._file.get_basename();
+  }
+
+  addToPanel(panel, id, settings) {
+    panel.addToStatusArea(id, this, settings.position, settings.box);
+  }
+
   _update() {
     if (this._updateRunning)
       return;

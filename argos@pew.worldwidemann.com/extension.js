@@ -52,15 +52,34 @@ constructor() {
 enable() {
   this.addAllButtons();
 
-  this.directoryChangedId = this.directoryMonitor.connect("changed", (monitor, file, otherFile, eventType) => {
-    if (eventType !== Gio.FileMonitorEvent.CREATED) {
-      this.removeButtonForFile(file);
-    }
+  directoryChangedId = directoryMonitor.connect("changed", function(monitor, file, otherFile, eventType) {
+    switch (eventType) {
+      case Gio.FileMonitorEvent.CREATED:
+      case Gio.FileMonitorEvent.MOVED_IN:
+        if (this.isValidArgosScript(file)) {
+          this.addButtonForFile(file);
+        }
+        break;
 
-    let relevantFile = otherFile ? otherFile : file;
+      case Gio.FileMonitorEvent.DELETED:
+      case Gio.FileMonitorEvent.MOVED_OUT:
+      case Gio.FileMonitorEvent.PRE_UNMOUNT:
+      case Gio.FileMonitorEvent.UNMOUNTED:
+        this.removeButtonForFile(file);
+        break;
 
-    if (this.isValidArgosScript(relevantFile)) {
-      this.addButtonForFile(relevantFile);
+      case Gio.FileMonitorEvent.MOVED:
+      case Gio.FileMonitorEvent.RENAMED:
+        this.removeButtonForFile(file);
+
+        if (this.isValidArgosScript(otherFile)) {
+          this.addButtonForFile(otherFile);
+        }
+        break;
+
+      default:
+        this.updateButtonForFile(file);
+        break;
     }
   });
 }
@@ -69,6 +88,17 @@ disable() {
   this.directoryMonitor.disconnect(this.directoryChangedId);
 
   this.removeButtons();
+}
+
+function updateButtonForFile(file) {
+  let basename = file.get_basename();
+  let button = buttons.find((b) => b && b.getFileBasename() == basename);
+
+  if (!button) {
+    return false;
+  }
+
+  button.update();
 }
 
 addButtonForFile(file) {

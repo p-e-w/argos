@@ -13,6 +13,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import EMOJI from './emoji.js'

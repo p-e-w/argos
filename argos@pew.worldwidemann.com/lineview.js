@@ -76,8 +76,6 @@ class ArgosLineView extends St.BoxLayout {
         texture.set_size(width, height);
 
         this.add_child(texture);
-        // Do not stretch the texture to the height of the container
-        this.child_set_property(texture, "y-fill", false);
       } catch (error) {
         log("Unable to load image from Base64 representation: " + error);
       }

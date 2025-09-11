@@ -70,12 +70,36 @@ export function parseFilename(filename) {
   return settings;
 }
 
+function locatePipe(str) {
+  let isEscaped = false;
+
+  for (let i = 0; i < str.length; i++) {
+    if (isEscaped) {
+      // Previous character was a backslash, reset state after current escaped character
+      isEscaped = false;
+      continue;
+    }
+
+    if (str[i] === "\\") {
+      // Enter escape state
+      isEscaped = true;
+      continue;
+    }
+
+    if (str[i] === "|" && !isEscaped) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
 // Performs (mostly) BitBar-compatible output line parsing
 // (see https://github.com/matryer/bitbar#plugin-api)
 export function parseLine(lineString) {
   let line = {};
 
-  let separatorIndex = lineString.indexOf("|");
+  let separatorIndex = locatePipe(lineString);
 
   if (separatorIndex >= 0) {
     let attributes = [];

@@ -28,6 +28,7 @@ export function parseFilename(filename) {
   let settings = {
     updateOnOpen: false,
     updateInterval: null,
+    pauseWhileOpen: false,
     position: 0,
     box: "right"
   };
@@ -37,9 +38,17 @@ export function parseFilename(filename) {
   let updatePart = (nameParts.length >= 3) ? nameParts[nameParts.length - 2] : null;
   let positionPart = (nameParts.length >= 4) ? nameParts[nameParts.length - 3] : null;
 
-  if (updatePart !== null && updatePart.endsWith("+")) {
-    settings.updateOnOpen = true;
-    updatePart = updatePart.substring(0, updatePart.length - 1);
+  if (updatePart !== null) {
+    while (["+", "P"].includes(updatePart.substring(updatePart.length - 1))) {
+      if (updatePart.endsWith("+")) {
+        settings.updateOnOpen = true;
+        updatePart = updatePart.substring(0, updatePart.length - 1);
+      }
+      if (updatePart.endsWith("P")) {
+        settings.pauseWhileOpen = true;
+        updatePart = updatePart.substring(0, updatePart.length - 1);
+      }
+    }
   }
 
   if (updatePart !== null && updatePart.length >= 2) {

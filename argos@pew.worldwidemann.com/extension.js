@@ -23,7 +23,6 @@ constructor() {
 
   this.directory = Gio.File.new_for_path(directoryPath);
   this.buttons = [];
-  this.debounceTimeout = null;
 
   if (!this.directory.query_exists(null)) {
     this.directory.make_directory(null);
@@ -51,19 +50,36 @@ constructor() {
 }
 
 enable() {
-  this.addButtons();
+  this.addAllButtons();
 
-  this.directoryChangedId = this.directoryMonitor.connect("changed", (monitor, file, otherFile, eventType) => {
-    this.removeButtons();
+  directoryChangedId = directoryMonitor.connect("changed", function(monitor, file, otherFile, eventType) {
+    switch (eventType) {
+      case Gio.FileMonitorEvent.CREATED:
+      case Gio.FileMonitorEvent.MOVED_IN:
+        if (this.isValidArgosScript(file)) {
+          this.addButtonForFile(file);
+        }
+        break;
 
-    // Some high-level file operations trigger multiple "changed" events in rapid succession.
-    // Debouncing groups them together to avoid unnecessary updates.
-    if (this.debounceTimeout === null) {
-      this.debounceTimeout = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
-        this.debounceTimeout = null;
-        this.addButtons();
-        return false;
-      });
+      case Gio.FileMonitorEvent.DELETED:
+      case Gio.FileMonitorEvent.MOVED_OUT:
+      case Gio.FileMonitorEvent.PRE_UNMOUNT:
+      case Gio.FileMonitorEvent.UNMOUNTED:
+        this.removeButtonForFile(file);
+        break;
+
+      case Gio.FileMonitorEvent.MOVED:
+      case Gio.FileMonitorEvent.RENAMED:
+        this.removeButtonForFile(file);
+
+        if (this.isValidArgosScript(otherFile)) {
+          this.addButtonForFile(otherFile);
+        }
+        break;
+
+      default:
+        this.updateButtonForFile(file);
+        break;
     }
   });
 }
@@ -71,13 +87,77 @@ enable() {
 disable() {
   this.directoryMonitor.disconnect(this.directoryChangedId);
 
-  if (this.debounceTimeout !== null)
-    GLib.source_remove(this.debounceTimeout);
-
   this.removeButtons();
 }
 
-addButtons() {
+function updateButtonForFile(file) {
+  let basename = file.get_basename();
+  let button = buttons.find((b) => b && b.getFileBasename() == basename);
+
+  if (!button) {
+    return false;
+  }
+
+  button.update();
+}
+
+addButtonForFile(file) {
+    let basename = file.get_basename();
+    let settings = Utilities.parseFilename(basename);
+    let button = new ArgosButton(file, settings);
+    let index = this.buttons.findIndex((b) => b && b.getFileBasename() == basename);
+
+    if (index < 0) {
+      // append it if not otherwise found
+      index = this.buttons.length;
+    }
+
+    // destroy existing button as we'll recreate
+    if (this.buttons[index] !== null) {
+      this.removeButton(index);
+    }
+
+    this.buttons[index] = button;
+    button.addToPanel(Main.panel, "argos-button-" + index, settings);
+}
+
+removeButtonForFile(file) {
+    let basename = file.get_basename();
+    let index = this.buttons.findIndex((b) => b && b.getFileBasename() == basename);
+
+    if (index >= 0) {
+      this.removeButton(index);
+    }
+}
+
+isValidArgosScript(file) {
+  return GLib.file_test(file.get_path(), GLib.FileTest.IS_EXECUTABLE) &&
+    !GLib.file_test(file.get_path(), GLib.FileTest.IS_DIR) &&
+    !file.get_basename().startsWith(".");
+}
+
+compareFilesForSort(file1, file2) {
+  let basename1 = file1.get_basename();
+  let basename2 = file2.get_basename();
+  let settings1 = Utilities.parseFilename(basename1);
+  let settings2 = Utilities.parseFilename(basename2);
+
+  let boxDiff = settings1.box.localeCompare(settings2.box);
+
+  if (boxDiff !== 0) {
+    return boxDiff;
+  }
+
+  let posDiff = settings1.position - settings2.position;
+
+  if (posDiff !== 0) {
+    return posDiff;
+  }
+
+  return basename1.localeCompare(basename2);
+}
+
+findButtonFiles() {
   let files = [];
 
   let enumerator = this.directory.enumerate_children(Gio.FILE_ATTRIBUTE_STANDARD_NAME, Gio.FileQueryInfoFlags.NONE, null);
@@ -86,30 +166,37 @@ addButtons() {
   while ((fileInfo = enumerator.next_file(null)) !== null) {
     let file = enumerator.get_child(fileInfo);
 
-    if (GLib.file_test(file.get_path(), GLib.FileTest.IS_EXECUTABLE) &&
-      !GLib.file_test(file.get_path(), GLib.FileTest.IS_DIR) &&
-      !file.get_basename().startsWith(".")) {
+    if (this.isValidArgosScript(file)) {
       files.push(file);
     }
   }
 
-  files.sort(function(file1, file2) {
-    return file1.get_basename().localeCompare(file2.get_basename());
-  });
+  files.sort(this.compareFilesForSort);
+
+  return files;
+}
+
+addAllButtons() {
+  const files = this.findButtonFiles();
 
   // Iterate in reverse order as buttons are added right-to-left
   for (let i = files.length - 1; i >= 0; i--) {
-    let settings = Utilities.parseFilename(files[i].get_basename());
-    let button = new ArgosButton(files[i], settings);
-    this.buttons.push(button);
-    Main.panel.addToStatusArea("argos-button-" + i, button, settings.position, settings.box);
+    this.addButtonForFile(files[i], i);
+  }
+}
+
+removeButton(index) {
+  if (this.buttons[index]) {
+    this.buttons[index].destroy();
+    this.buttons[index] = null;
   }
 }
 
 removeButtons() {
   for (let i = 0; i < this.buttons.length; i++) {
-    this.buttons[i].destroy();
+    this.removeButton(i);
   }
   this.buttons = [];
 }
+
 }

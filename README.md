@@ -201,7 +201,7 @@ then
 * the plugin is re-run and its output re-rendered every `INTERVAL`, and
 * if `INTERVAL` is followed by `+`, the plugin is additionally re-run each time the dropdown menu is opened.
 
-`POSITION` may be omitted entirely (in which case the button is placed before all other buttons on the right-hand side of the panel) while `INTERVAL` can be left empty. For example, a script named `plugin.10s.sh` is updated every 10 seconds, the button belonging to `plugin.1c..sh` is positioned just right of the GNOME Shell clock, and `plugin.l.1m.sh` is displayed left of the "Activities" button and updated every minute.
+`POSITION` may be omitted entirely (in which case the button is placed before all other buttons on the right-hand side of the panel) while `INTERVAL` can be left empty. For example, a script named `plugin.10s.sh` is updated every 10 seconds, the button belonging to `plugin.1c..sh` is positioned just right of the GNOME Shell clock and the script is only run once at startup, and `plugin.l.1m.sh` is displayed left of the "Activities" button and updated every minute. A blugin named `plugin.1c.+.sh` is run only when its taskbar button is clicked.
 
 ### Output format
 

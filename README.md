@@ -287,7 +287,7 @@ These screenshots show how some scripts from the BitBar plugin repository look w
 | [**Stock Ticker**](https://getbitbar.com/plugins/Finance/gfinance.5m.py) | ![Stock Ticker/BitBar](https://cloud.githubusercontent.com/assets/2702526/21953537/29818494-da60-11e6-9df0-becf03a42553.png) | ![Stock Ticker/Argos](https://cloud.githubusercontent.com/assets/2702526/21953535/1b93fc0e-da60-11e6-8bb0-7eb349045230.png) |
 | [**World Clock**](https://getbitbar.com/plugins/Time/worldclock.1s.sh) | ![World Clock/BitBar](https://cloud.githubusercontent.com/assets/2702526/21953545/4d946c3e-da60-11e6-863c-552ee2ab9282.png) | ![World Clock/Argos](https://cloud.githubusercontent.com/assets/2702526/21953541/41388042-da60-11e6-99dc-770d0b6a668a.png) |
 | [**Unicorn**](https://getbitbar.com/plugins/Web/Cornify/cornify.1m.sh) | ![Unicorn/BitBar](https://cloud.githubusercontent.com/assets/2702526/21953552/75dc46f8-da60-11e6-9f61-53464281876c.png) | ![Unicorn/Argos](https://cloud.githubusercontent.com/assets/2702526/21953550/68297b98-da60-11e6-9823-c76340527330.png) |
-| [**ANSI**](https://getbitbar.com/plugins/Tutorial/ansi.sh) | ![ANSI/BitBar](https://cloud.githubusercontent.com/assets/2702526/21953559/a2c26b52-da60-11e6-9e0e-1be3550a2116.png) | ![ANSI/Argos](https://cloud.githubusercontent.com/assets/2702526/21953553/911d790a-da60-11e6-92a1-b6e20d423f72.png) |
+| **ANSI** | ![ANSI/BitBar](https://cloud.githubusercontent.com/assets/2702526/21953559/a2c26b52-da60-11e6-9e0e-1be3550a2116.png) | ![ANSI/Argos](https://cloud.githubusercontent.com/assets/2702526/21953553/911d790a-da60-11e6-92a1-b6e20d423f72.png) |
 
 
 ## Acknowledgments

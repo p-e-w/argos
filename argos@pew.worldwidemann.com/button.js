@@ -18,6 +18,7 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import ArgosLineView from './lineview.js';
 import ArgosMenuItem from './menuitem.js';
 import * as Utilities from './utilities.js';
+import SubmenuState from './submenu_state.js';
 
 const cArgosButton = GObject.registerClass({
   GTypeName: "ArgosButton",
@@ -30,6 +31,7 @@ class ArgosButton extends PanelMenu.Button {
 
     this._file = file;
     this._updateInterval = settings.updateInterval;
+    this._subs = new SubmenuState();
 
     this._lineView = new ArgosLineView();
     this._lineView.setMarkup("<small><i>" + GLib.markup_escape_text(file.get_basename(), -1) + " ...</i></small>");
@@ -131,7 +133,7 @@ class ArgosButton extends PanelMenu.Button {
         buttonLines.push(line);
       }
     }
-
+    this._subs.prepareForUpdate(this);
     this.menu.removeAll();
 
     if (this._cycleTimeout !== null) {
@@ -190,6 +192,16 @@ class ArgosButton extends PanelMenu.Button {
         // an error or warning, this should be considered a bug in GNOME Shell.
         // Once it is fixed, this code will work as expected for nested submenus.
         menuItem = new PopupMenu.PopupSubMenuMenuItem("", false);
+        //add optional support for restore after refresh
+        if (dropdownLines[i].id) {
+          menuItem._submenuKey = dropdownLines[i].id;
+        }
+        if (dropdownLines[i].minwidth) {
+          const px = parseInt(dropdownLines[i].minwidth, 10);
+          if (Number.isFinite(px) && px > 0) {
+            menuItem.actor.set_style(`min-width:${px}px;`);
+          }
+        }
         let lineView = new ArgosLineView(dropdownLines[i]);
         menuItem.actor.insert_child_below(lineView, menuItem.label);
         menuItem.label.visible = false;
@@ -206,6 +218,12 @@ class ArgosButton extends PanelMenu.Button {
       }
 
       menu.addMenuItem(menuItem);
+     if (menuItem._submenuKey && this._subs.wasOpen(menuItem._submenuKey)) {
+        GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+            menuItem.menu.open(false); 
+            return GLib.SOURCE_REMOVE;
+        });
+     }
     }
 
     if (dropdownLines.length > 0)
@@ -217,7 +235,9 @@ class ArgosButton extends PanelMenu.Button {
     menuItem.connect("activate", () => {
       Gio.AppInfo.launch_default_for_uri("file://" + this._file.get_path(), null);
     });
+
     this.menu.addMenuItem(menuItem);
+    this._subs.finalizeUpdate(this);
   }
 });
 

@@ -32,7 +32,6 @@ const cArgosMenuItem = GObject.registerClass(
       });
 
       let altSwitcher = null;
-
       let lineView = new ArgosLineView(line);
 
       if (typeof alternateLine === "undefined") {
@@ -56,6 +55,10 @@ const cArgosMenuItem = GObject.registerClass(
 	    eval(activeLine.eval);
 
 	  if (activeLine.hasOwnProperty("bash")) {
+        // support reopen
+        if (activeLine.reopen === "true") {
+            button._subs.requestReopen(button);
+        }
 	    let argv = [];
 
 
@@ -78,7 +81,9 @@ const cArgosMenuItem = GObject.registerClass(
 	    }
 	  } else if (activeLine.refresh === "true") {
 	    button.update();
-	  }
+	  }else if (activeLine.reopen === "true") { // trigger update even without bash
+        button.update();
+      }
 	});
       }
     }

@@ -64,7 +64,7 @@ const cArgosMenuItem = GObject.registerClass(
 	    } else {
 	      // Run shell immediately after executing the command to keep the terminal window open
 	      // (see http://stackoverflow.com/q/3512055)
-	      argv = ["gnome-terminal", "--", "bash", "-c", activeLine.bash + "; exec ${SHELL:=bash}"];
+	      argv = ["xdg-terminal-exec", "--", "bash", "-c", activeLine.bash + "; exec ${SHELL:=bash}"];
 	    }
 
 	    let [success, pid] = GLib.spawn_async(

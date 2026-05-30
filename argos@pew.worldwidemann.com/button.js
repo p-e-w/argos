@@ -82,6 +82,7 @@ class ArgosButton extends PanelMenu.Button {
 
     let envp = GLib.get_environ();
     envp.push("ARGOS_VERSION=2");
+    envp.push("ARGOS_THEME=" + GLib.getenv("GTK_THEME") + "");
     envp.push("ARGOS_MENU_OPEN=" + (this.menu.isOpen ? "true" : "false"));
 
     try {

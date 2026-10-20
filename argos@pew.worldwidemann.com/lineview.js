@@ -34,6 +34,17 @@ class ArgosLineView extends St.BoxLayout {
   setLine(line) {
     this.line = line;
 
+    // A text-only line rewrites the label it already has rather than
+    // replacing it, so a script that changes its text every second does not
+    // leave a label behind for the garbage collector every second.
+    let textOnly = !line.hasOwnProperty("iconName") && !line.hasOwnProperty("image") &&
+      !line.hasOwnProperty("templateImage") && line.markup.length > 0;
+    if (textOnly && this._textLabel) {
+      this._setLabelText(this._textLabel, line);
+      return;
+    }
+    this._textLabel = null;
+
     this.remove_all_children();
 
     if (line.hasOwnProperty("iconName")) {
@@ -90,21 +101,32 @@ class ArgosLineView extends St.BoxLayout {
       });
 
       this.add_child(label);
+      this._setLabelText(label, line);
 
-      let clutterText = label.get_clutter_text();
-      clutterText.text = line.markup;
-      clutterText.use_markup = true;
+      if (textOnly)
+        this._textLabel = label;
+    }
+  }
 
-      if (line.hasOwnProperty("length")) {
-        let maxLength = parseInt(line.length, 10);
-        // "clutterText.text.length" fails for non-BMP Unicode characters
-        let textLength = clutterText.buffer.get_length();
+  _setLabelText(label, line) {
+    let clutterText = label.get_clutter_text();
+    // Markup off first. With markup on, the text property parses the new
+    // markup at once, and turning markup on again re-parses the plain result,
+    // which drops every attribute. Off, then text, then on is the path a new
+    // label takes.
+    clutterText.use_markup = false;
+    clutterText.text = line.markup;
+    clutterText.use_markup = true;
 
-        if (!isNaN(maxLength) && textLength > maxLength) {
-          clutterText.set_cursor_position(maxLength);
-          clutterText.delete_chars(textLength);
-          clutterText.insert_text("...", maxLength);
-        }
+    if (line.hasOwnProperty("length")) {
+      let maxLength = parseInt(line.length, 10);
+      // "clutterText.text.length" fails for non-BMP Unicode characters
+      let textLength = clutterText.buffer.get_length();
+
+      if (!isNaN(maxLength) && textLength > maxLength) {
+        clutterText.set_cursor_position(maxLength);
+        clutterText.delete_chars(textLength);
+        clutterText.insert_text("...", maxLength);
       }
     }
   }

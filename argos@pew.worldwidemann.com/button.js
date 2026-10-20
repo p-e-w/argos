@@ -43,6 +43,20 @@ class ArgosButton extends PanelMenu.Button {
     this.connect("destroy", this._onDestroy.bind(this));
 
     this._updateRunning = false;
+    this._lastOutput = null;
+    this._menuSource = null;
+    this._pendingMenu = null;
+
+    // A menu that changed while closed is built just before it opens (see
+    // _processOutput). Before open, not in its open-state-changed: separators
+    // hide themselves from that signal, and a handler connected while it is
+    // being emitted misses that emission.
+    const openMenu = this.menu.open.bind(this.menu);
+    this.menu.open = (animate) => {
+      if (this._pendingMenu !== null)
+        this._buildMenu();
+      openMenu(animate);
+    };
 
     this._update();
 
@@ -92,7 +106,12 @@ class ArgosButton extends PanelMenu.Button {
           if (this._isDestroyed)
             return;
 
-          this._processOutput(standardOutput.split("\n"));
+          // Skip a run whose output did not change, unless the button
+          // cycles: reprocessing restarts the cycle.
+          if (standardOutput !== this._lastOutput || this._cycleTimeout !== null) {
+            this._processOutput(standardOutput.split("\n"));
+            this._lastOutput = standardOutput;
+          }
 
           if (this._updateInterval !== null) {
             this._updateTimeout =
@@ -114,6 +133,9 @@ class ArgosButton extends PanelMenu.Button {
   _processOutput(output) {
     let buttonLines = [];
     let dropdownLines = [];
+    // The raw lines, to tell a label-only change from a menu change.
+    let buttonSource = [];
+    let dropdownSource = [];
 
     let dropdownMode = false;
 
@@ -127,12 +149,12 @@ class ArgosButton extends PanelMenu.Button {
         dropdownMode = true;
       } else if (dropdownMode) {
         dropdownLines.push(line);
+        dropdownSource.push(output[i]);
       } else {
         buttonLines.push(line);
+        buttonSource.push(output[i]);
       }
     }
-
-    this.menu.removeAll();
 
     if (this._cycleTimeout !== null) {
       GLib.source_remove(this._cycleTimeout);
@@ -156,7 +178,33 @@ class ArgosButton extends PanelMenu.Button {
         this._lineView.setLine(buttonLines[i % buttonLines.length]);
         return true;
       });
+    }
 
+    // Build the menu only when it changed, and only once it is open. Menu
+    // items are JavaScript subclasses, so GJS holds them by toggle reference,
+    // and destroying one schedules a forced full garbage collection 10 seconds
+    // later (gi/object.cpp, toggle_down). Rebuilding every menu on every run
+    // made any script whose output changed within 10 seconds stall the shell
+    // on every such collection. Button lines join the menu only when there
+    // are several.
+    const menuSource = (buttonLines.length > 1 ? buttonSource.join("\n") : "") +
+      "\n---\n" + dropdownSource.join("\n");
+    if (menuSource === this._menuSource)
+      return;
+    this._menuSource = menuSource;
+    this._pendingMenu = {buttonLines, dropdownLines};
+    // An empty menu refuses to open, so the first one is built at once.
+    if (this.menu.isOpen || this.menu.numMenuItems === 0)
+      this._buildMenu();
+  }
+
+  _buildMenu() {
+    const {buttonLines, dropdownLines} = this._pendingMenu;
+    this._pendingMenu = null;
+
+    this.menu.removeAll();
+
+    if (buttonLines.length > 1) {
       for (let j = 0; j < buttonLines.length; j++) {
         if (buttonLines[j].dropdown !== "false")
           this.menu.addMenuItem(new ArgosMenuItem(this, buttonLines[j]));

@@ -14,7 +14,6 @@ import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GioUnix from 'gi://GioUnix';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import EMOJI from './emoji.js'
 
@@ -248,22 +247,28 @@ export function ansiToMarkup(text) {
 // Combines the benefits of spawn_sync (easy retrieval of output)
 // with those of spawn_async (non-blocking execution).
 // Based on https://github.com/optimisme/gjs-examples/blob/master/assets/spawn.js.
+//
+// Uses Gio.Subprocess rather than GLib.spawn_async_with_pipes. GNOME Shell 47
+// and later wrap the GLib.spawn_* functions for extensions (js/ui/environment.js)
+// with a child_setup, which makes GLib fork() the entire shell process for every
+// launch. Gio.Subprocess is not wrapped, and with no working directory, no
+// child_setup and INHERIT_FDS, GLib starts the script through posix_spawn (vfork).
+// flags and childSetup are ignored.
 export function spawnWithCallback(workingDirectory, argv, envp, flags, childSetup, callback) {
-  let [success, pid, stdinFile, stdoutFile, stderrFile] = GLib.spawn_async_with_pipes(
-    workingDirectory, argv, envp, flags, childSetup);
+  let launcher = new Gio.SubprocessLauncher({
+    flags: Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE |
+      Gio.SubprocessFlags.INHERIT_FDS
+  });
+  launcher.set_environ(envp);
+  if (workingDirectory)
+    launcher.set_cwd(workingDirectory);
 
-  if (!success)
-    return;
-
-  GLib.close(stdinFile);
-  GLib.close(stderrFile);
+  let proc = launcher.spawnv(argv);
 
   let standardOutput = "";
 
   let stdoutStream = new Gio.DataInputStream({
-    base_stream: new GioUnix.InputStream({
-      fd: stdoutFile
-    })
+    base_stream: proc.get_stdout_pipe()
   });
 
   readStream(stdoutStream, function(output) {
